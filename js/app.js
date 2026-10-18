@@ -61,8 +61,6 @@ function loadVoices() {
     .sort((a, b) => voiceScore(b) - voiceScore(a));
   const saved = store.get("voice", null);
   englishVoice = englishVoices.find((v) => v.voiceURI === saved) || englishVoices[0] || null;
-  const picker = $("#voice");
-  if (picker) picker.outerHTML = voicePicker();
 }
 if ("speechSynthesis" in window) {
   loadVoices();
@@ -72,7 +70,8 @@ if ("speechSynthesis" in window) {
 // Audios pregrabados con la voz Ava (Premium); los genera scripts/generar_audios.py.
 const RECORDED = typeof AUDIO_FILES !== "undefined" ? AUDIO_FILES : {};
 const HAS_RECORDED = Object.keys(RECORDED).length > 0;
-let useRecorded = HAS_RECORDED && store.get("voice", "recorded") === "recorded";
+// Todos los audios usan la voz grabada de Ava; la voz del dispositivo solo suena si un texto no tiene grabación.
+const useRecorded = HAS_RECORDED;
 let currentAudio = null;
 
 // Hash FNV-1a del texto: es el nombre del archivo de audio (scripts/generar_audios.py usa esta misma función).
@@ -85,19 +84,6 @@ function audioKey(text) {
   return h.toString(16).padStart(8, "0");
 }
 const spokenText = (text) => text.replace(/\s*\/\s*/g, ", ");
-
-function voicePicker() {
-  const usable = englishVoices.filter((v) => voiceScore(v) > -1000);
-  const list = usable.length ? usable : englishVoices;
-  if (!list.length && !HAS_RECORDED) return `<p class="muted" id="voice">No se encontraron voces en inglés en este dispositivo.</p>`;
-  return `
-    <select id="voice">
-      ${HAS_RECORDED ? `<option value="recorded" ${useRecorded ? "selected" : ""}>Ava · voz grabada (recomendada)</option>` : ""}
-      ${list
-        .map((v) => `<option value="${esc(v.voiceURI)}" ${!useRecorded && v === englishVoice ? "selected" : ""}>${esc(v.name)} (${esc(v.lang)})</option>`)
-        .join("")}
-    </select>`;
-}
 
 let playlistId = 0; // cambia cada vez que se reproduce algo nuevo, para cortar un diálogo en curso
 
@@ -172,6 +158,37 @@ const VOCAB_GROUPS = [
 ];
 const vocabGroup = (id) => VOCAB.filter((c) => (c.group || "servicio") === id);
 
+// ---------- Colores e íconos de los menús ----------
+const PALETTE = [
+  ["#c2410c", "#f59e0b"], ["#159a8c", "#3cc3a4"], ["#1864ab", "#4dabf7"], ["#862e9c", "#cc5de8"], ["#2b8a3e", "#69c06e"],
+  ["#c92a2a", "#ff8787"], ["#e67700", "#fcc419"], ["#364fc7", "#748ffc"], ["#a61e4d", "#f06595"], ["#0b7285", "#3bc9db"],
+  ["#5c940d", "#a9d24b"], ["#8a4b2e", "#c9823f"], ["#495057", "#adb5bd"], ["#9c36b5", "#e599f7"],
+];
+const paint = (i) => `--c1:${PALETTE[i % PALETTE.length][0]};--c2:${PALETTE[i % PALETTE.length][1]}`;
+const svgIcon = (d) => `<svg viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
+const MENU_ICONS = {
+  vocab: '<path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v15H5.5A1.5 1.5 0 0 0 4 20.5zM20 5.5A1.5 1.5 0 0 0 18.5 4H13v15h5.5a1.5 1.5 0 0 1 1.5 1.5zM11 19h2"/>',
+  alimentos: '<path d="M12 7c-1.5-2-6-2.5-7 1.5S6.5 20 9 20c1.3 0 1.8-.6 3-.6s1.7.6 3 .6c2.5 0 5-7.5 4-11.5S13.5 5 12 7z"/><path d="M12 7c0-2 1-3.5 2.5-4"/>',
+  frases: '<path d="M4 5h11v8H8l-4 3.5zM15 9h5v8h-1v3l-3.5-3H10v-4"/>',
+  menu: '<path d="M6 3h12v18H6z"/><path d="M9 7.5h6M9 11h6M9 14.5h4"/>',
+  vinos: '<path d="M8 3h8c0 4.5-1.5 8-4 8s-4-3.5-4-8zM12 11v9M8.5 21h7M8.3 6.5h7.4"/>',
+  script: '<path d="M7 3h10v4H7zM5 7h14v14H5z"/><path d="M8.5 11.5h7M8.5 14.5h7M8.5 17.5h4"/>',
+  practicar: '<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/>',
+  cards: '<rect x="3" y="6" width="12" height="15" rx="2"/><path d="M8 3h11a2 2 0 0 1 2 2v13"/>',
+  quiz: '<circle cx="12" cy="12" r="8.5"/><path d="M8 12.5l2.7 2.7L16.5 9"/>',
+  listen: '<path d="M4 14v-2a8 8 0 0 1 16 0v2"/><rect x="3" y="14" width="4" height="6" rx="1.5"/><rect x="17" y="14" width="4" height="6" rx="1.5"/>',
+};
+// Recuadro de color con franja degradada (mismo estilo que Menús y Service Script).
+const colorTile = ({ href, i, icon, title, sub = "", meta = "", attrs = "" }) => `
+  <${href ? `a href="${href}"` : "button type=\"button\""} class="rest-tile" style="${paint(i)}" ${attrs}>
+    <span class="rest-top"><span class="rest-icon">${svgIcon(icon)}</span></span>
+    <span class="rest-body">
+      <span class="rest-name">${title}</span>
+      ${sub ? `<span class="rest-cuisine">${sub}</span>` : ""}
+      ${meta ? `<span class="rest-meta">${meta}</span>` : ""}
+    </span>
+  </${href ? "a" : "button"}>`;
+
 // ---------- Vistas ----------
 function viewHome() {
   const tip = ALL_PHRASES[Math.floor(Math.random() * ALL_PHRASES.length)];
@@ -197,20 +214,18 @@ function viewHome() {
       <div class="row">${speakButtons(tip.en)}</div>
     </section>
 
-    <section class="card">
-      <h2>Voz de los audios</h2>
-      <div class="field">${voicePicker()}</div>
-      <button class="btn small" data-speak="Good evening, welcome! Here is your menu.">🔊 Probar voz</button>
-    </section>
-
-    <nav class="grid">
-      <a class="tile" href="#/vocab"><span>📚</span>Vocabulario</a>
-      <a class="tile" href="#/alimentos"><span>🍎</span>Alimentos y bebidas</a>
-      <a class="tile" href="#/frases"><span>💬</span>Frases de servicio</a>
-      <a class="tile" href="#/menu"><span>📋</span>Menús</a>
-      <a class="tile" href="#/vinos"><span>🍷</span>Carta de vinos</a>
-      <a class="tile" href="#/script"><span>📜</span>Service Script</a>
-      <a class="tile" href="#/practicar"><span>🎯</span>Practicar</a>
+    <nav class="rest-grid home-grid">
+      ${[
+        ["#/vocab", "vocab", "Vocabulario", "Palabras con audio e imagen"],
+        ["#/alimentos", "alimentos", "Alimentos y bebidas", "Frutas, carnes, bebidas…"],
+        ["#/frases", "frases", "Frases de servicio", "Por etapa del servicio"],
+        ["#/menu", "menu", "Menús", "Restaurantes del hotel"],
+        ["#/vinos", "vinos", "Carta de vinos", "Uva, maridaje y venta"],
+        ["#/script", "script", "Service Script", "Diálogos con estándares AAA"],
+        ["#/practicar", "practicar", "Practicar", "Tarjetas, quiz y escucha"],
+      ]
+        .map(([href, key, title, sub], i) => colorTile({ href, i, icon: MENU_ICONS[key], title, sub }))
+        .join("")}
     </nav>`;
 }
 
@@ -225,7 +240,7 @@ function categoryCards(cats, activeId = null) {
       const photos = c.words.map((w) => PHOTOS[w.en]).filter(Boolean);
       const photo = photos.find((ph) => ph.source === "canva") || photos[0]; // primero las imágenes de Canva
       return `
-      <a class="cat-card ${c.id === activeId ? "active" : ""}" href="#/vocab/${c.id}">
+      <a class="cat-card ${c.id === activeId ? "active" : ""}" href="#/vocab/${c.id}" style="${paint(VOCAB.indexOf(c))}">
         <span class="cat-photo" ${photo ? `style="background-image:url('${esc(photo.src)}')"` : ""}>${photo ? "" : c.icon}</span>
         <span class="cat-body">
           <span class="cat-name">${c.icon} ${esc(c.title)}</span>
@@ -324,8 +339,8 @@ function viewPhrases() {
     <p class="muted">Ordenadas según las etapas del servicio. Toca 🔊 para escuchar y 🐢 para escuchar despacio.</p>
     ${PHRASES.map(
       (s, i) => `
-      <details class="card" ${i === 0 ? "open" : ""}>
-        <summary>${s.icon} ${esc(s.title)}</summary>
+      <details class="card phrase-group" ${i === 0 ? "open" : ""} style="${paint(i)}">
+        <summary><span class="pg-icon">${s.icon}</span><span>${esc(s.title)}</span><span class="pg-count">${s.items.length}</span></summary>
         ${s.items
           .map(
             (p) => `
@@ -550,15 +565,19 @@ function viewWines(catId) {
     return `<h1>Vinos</h1><p class="muted">No hay carta de vinos cargada. Ejecuta <code>scripts/importar_contenido_hotel.py</code>.</p>`;
   }
   if (catId) wineState = { cat: catId, query: "" };
+  const WINE_COLORS = { tinto: ["#7f1d3a", "#c2385b"], blanco: ["#b58a12", "#e9c84a"], rosado: ["#d6457a", "#f7a1bd"],
+    espumoso: ["#a07b2d", "#e6cf8a"], dulce: ["#b4561a", "#f0a24a"] };
   const chips = WINE_CATEGORIES.map((c) => {
     const n = HOTEL_DATA.wines.filter((w) => wineCategory(w) === c).length;
-    return `<a class="chip ${c.id === wineState.cat ? "active" : ""}" href="#/vinos/${c.id}">${c.label} (${n})</a>`;
+    const [c1, c2] = WINE_COLORS[c.id] || PALETTE[0];
+    return `<a class="wine-tile ${c.id === wineState.cat ? "active" : ""}" href="#/vinos/${c.id}" style="--c1:${c1};--c2:${c2}">
+      ${svgIcon(MENU_ICONS.vinos)}<span><b>${c.label}</b><small>${n} vinos</small></span></a>`;
   }).join("");
   return `
     <h1>Carta de vinos</h1>
     <p class="muted">Cada vino incluye una frase lista para recomendarlo en inglés.</p>
     <input id="wine-search" class="search" type="search" placeholder="Buscar por nombre, uva, país o maridaje…" autocomplete="off">
-    <div class="chips">${chips}</div>
+    <div class="wine-tiles">${chips}</div>
     <div id="wine-list">${wineList()}</div>`;
 }
 
@@ -617,6 +636,17 @@ function stageIcon(st) {
   return `<span class="stage-icon">${svg ? `<svg viewBox="0 0 24 24" aria-hidden="true">${svg}</svg>` : st.icon}</span>`;
 }
 
+// Color de cada etapa del Service Script (degradado), recorriendo el arcoíris de la bienvenida a la despedida.
+const STAGE_COLORS = [
+  ["#c2410c", "#f59e0b"], ["#d9480f", "#f7a046"], ["#e67700", "#fcc419"], ["#5c940d", "#a9d24b"], ["#2b8a3e", "#69c06e"],
+  ["#0b7285", "#3bc9db"], ["#1864ab", "#4dabf7"], ["#862e9c", "#cc5de8"], ["#a61e4d", "#f06595"], ["#c92a2a", "#ff8787"],
+  ["#9c36b5", "#e599f7"], ["#364fc7", "#748ffc"], ["#1c3d6e", "#5c7cfa"], ["#495057", "#adb5bd"], ["#212529", "#868e96"],
+];
+const stageColor = (n) => {
+  const [c1, c2] = STAGE_COLORS[n % STAGE_COLORS.length];
+  return `--c1:${c1};--c2:${c2}`;
+};
+
 // Menú de inicio del Service Script: un recuadro por etapa.
 function scriptMenu(stages) {
   const seen = new Set(store.get("scriptSeen", []));
@@ -628,16 +658,21 @@ function scriptMenu(stages) {
     <h1>Service Script</h1>
     <p class="muted">Guion formal de servicio con estándares AAA, de la bienvenida a la despedida. Elige una etapa.</p>
     <p class="muted">${seen.size} de ${stages.length} etapas revisadas</p>
-    <div class="stage-grid">
+    <div class="rest-grid">
       ${stages
         .map(
           (st, n) => `
-        <a class="stage-tile ${seen.has(st.id) ? "is-seen" : ""}" href="#/script/${st.id}">
-          ${stageIcon(st)}
-          <span class="stage-num">Etapa ${n + 1}</span>
-          <span class="stage-name">${esc(st.titleEs)}</span>
-          <span class="stage-en">${esc(st.title)}</span>
-          <span class="stage-role">${roles(st)}${seen.has(st.id) ? " · ✓ Revisada" : ""}</span>
+        <a class="rest-tile ${seen.has(st.id) ? "is-seen" : ""}" href="#/script/${st.id}" style="${stageColor(n)}">
+          <span class="rest-top">
+            <span class="rest-icon">${stageIcon(st).replace(/^<span class="stage-icon">|<\/span>$/g, "")}</span>
+            <span class="stage-badge">${n + 1}</span>
+            ${seen.has(st.id) ? `<span class="seen-badge">✓</span>` : ""}
+          </span>
+          <span class="rest-body">
+            <span class="rest-name">${esc(st.titleEs)}</span>
+            <span class="rest-cuisine">${esc(st.title)}</span>
+            <span class="rest-meta">${roles(st)}${seen.has(st.id) ? " · Revisada" : ""}</span>
+          </span>
         </a>`
         )
         .join("")}
@@ -665,11 +700,17 @@ function viewScript(stageId) {
     .join("");
   const prev = stages[i - 1], next = stages[i + 1];
   return `
+    <div class="rest-page" style="${stageColor(i)}">
     <a class="back" href="#/script">← Todas las etapas</a>
+    <section class="rest-hero">
+      <span class="rest-icon">${stageIcon(st).replace(/^<span class="stage-icon">|<\/span>$/g, "")}</span>
+      <div>
+        <p class="hero-step">Etapa ${i + 1} de ${stages.length}</p>
+        <h1>${esc(st.titleEs)}</h1>
+        <p>${esc(st.title)}</p>
+      </div>
+    </section>
     <section class="card">
-      <p class="label">Etapa ${i + 1} de ${stages.length}</p>
-      <h2 class="stage-title stage-head">${stageIcon(st)}<span>${esc(st.title)}</span></h2>
-      <p class="muted">${esc(st.titleEs)}</p>
       <div class="standards">
         <p class="label">⭐ Estándares AAA</p>
         <ul>${st.standards.map((x) => `<li>${esc(x)}</li>`).join("")}</ul>
@@ -683,6 +724,7 @@ function viewScript(stageId) {
     <div class="row between stage-nav">
       ${prev ? `<a class="btn ghost small" href="#/script/${prev.id}">← ${esc(prev.titleEs)}</a>` : "<span></span>"}
       ${next ? `<a class="btn small" href="#/script/${next.id}">${esc(next.titleEs)} →</a>` : ""}
+    </div>
     </div>`;
 }
 
@@ -703,10 +745,10 @@ function viewPractice() {
         ).join("")}
       </select>
     </label>
-    <div class="grid">
-      <button class="tile" data-mode="cards"><span>🃏</span>Tarjetas</button>
-      <button class="tile" data-mode="quiz"><span>✅</span>Quiz</button>
-      <button class="tile" data-mode="listen"><span>👂</span>Escucha</button>
+    <div class="rest-grid">
+      ${colorTile({ i: 1, icon: MENU_ICONS.cards, title: "Tarjetas", sub: "Recuerda la palabra", attrs: 'data-mode="cards"' })}
+      ${colorTile({ i: 3, icon: MENU_ICONS.quiz, title: "Quiz", sub: "Elige la traducción", attrs: 'data-mode="quiz"' })}
+      ${colorTile({ i: 0, icon: MENU_ICONS.listen, title: "Escucha", sub: "Oye y elige el significado", attrs: 'data-mode="listen"' })}
     </div>
     <p class="muted">
       <b>Tarjetas:</b> ves la palabra en español y recuerdas el inglés.<br>
@@ -958,13 +1000,6 @@ document.addEventListener("click", (e) => {
   if (modeBtn) startSession(modeBtn.dataset.mode, $("#pool").value);
 });
 
-document.addEventListener("change", (e) => {
-  if (e.target.id !== "voice") return;
-  useRecorded = e.target.value === "recorded";
-  englishVoice = englishVoices.find((v) => v.voiceURI === e.target.value) || englishVoice;
-  store.set("voice", e.target.value);
-  speak("Good evening, welcome!");
-});
 
 // El botón flotante para volver a las categorías aparece al bajar por la lista de palabras.
 window.addEventListener("scroll", () => {
