@@ -1,0 +1,15 @@
+{
+  "name": "English for Waiters",
+  "short_name": "Waiters English",
+  "description": "Inglés de servicio para meseros: vocabulario, frases, menús, vinos y Service Script.",
+  "lang": "es",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f6f4ef",
+  "theme_color": "#1f6f5c",
+  "icons": [
+    { "src": "images/app/icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "images/app/icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}

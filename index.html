@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#1f6f5c">
+  <!-- App interna: que no aparezca en buscadores -->
+  <meta name="robots" content="noindex, nofollow">
+  <title>English for Waiters</title>
+  <link rel="stylesheet" href="css/styles.css">
+  <!-- Instalar en el celular como app (manifest.webmanifest) -->
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="images/app/icon-192.png">
+  <link rel="apple-touch-icon" href="images/app/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="Waiters English">
+</head>
+<body>
+  <main id="app" class="container"></main>
+
+  <nav class="tabbar" aria-label="Menú principal">
+    <div class="nav-brand">
+      <span class="nav-mark">EW</span>
+      <span class="nav-brand-text"><strong>English for Waiters</strong><small>Inglés de servicio · Restaurantes</small></span>
+    </div>
+    <p class="nav-section">Estudiar</p>
+    <a href="#/"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 11 12 4l8.5 7M6 9.5V20h4.5v-5.5h3V20H18V9.5"/></svg><span class="nav-label">Inicio</span></a>
+    <a href="#/vocab"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v15H5.5A1.5 1.5 0 0 0 4 20.5zM20 5.5A1.5 1.5 0 0 0 18.5 4H13v15h5.5a1.5 1.5 0 0 1 1.5 1.5zM11 19h2"/></svg><span class="nav-label">Vocabulario</span></a>
+    <a href="#/frases"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11v8H8l-4 3.5zM15 9h5v8h-1v3l-3.5-3H10v-4"/></svg><span class="nav-label">Frases</span></a>
+    <a href="#/menu"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18H6z"/><path d="M9 7.5h6M9 11h6M9 14.5h4"/></svg><span class="nav-label">Menús</span></a>
+    <a href="#/vinos"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8c0 4.5-1.5 8-4 8s-4-3.5-4-8zM12 11v9M8.5 21h7M8.3 6.5h7.4"/></svg><span class="nav-label">Vinos</span></a>
+    <a href="#/script"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v4H7zM5 7h14v14H5z"/><path d="M8.5 11.5h7M8.5 14.5h7M8.5 17.5h4"/></svg><span class="nav-label">Service Script</span></a>
+    <a href="#/practicar"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span class="nav-label">Practicar</span></a>
+    <p class="nav-foot">Estándares AAA · Hotelería</p>
+  </nav>
+
+  <script src="js/data.js"></script>
+  <!-- Menús y vinos reales del hotel; si no existe, la app usa el menú de ejemplo -->
+  <script src="js/hotel-data.js"></script>
+  <script src="js/images.js"></script>
+  <script src="js/service-script.js"></script>
+  <script src="js/script-icons.js"></script>
+  <!-- Índices de audios grabados (scripts/generar_audios.py); el del hotel está fuera de git -->
+  <script src="js/audio-base.js"></script>
+  <script src="js/audio-hotel.js"></script>
+  <!-- Lista cifrada de colaboradores con acceso (scripts/generar_acceso.py) -->
+  <script src="js/acceso.js"></script>
+  <script src="js/uso.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
