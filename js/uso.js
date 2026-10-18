@@ -36,13 +36,17 @@ const USO = (() => {
   let user = load(KEY_USER, null);
   if (user && user.v !== 2) user = null;
   let fallos = 0;
+  // Modo instructor: se activa una vez por dispositivo con el enlace personal (?instructor=<clave>,
+  // ver scripts/generar_acceso.py). No pide PIN ni registra actividad.
+  const KEY_INSTR = "uso-instructor";
+  let instructor = load(KEY_INSTR, false) === true;
   let queue = load(KEY_QUEUE, []);
   let lastInteraction = Date.now();
   let sending = false;
   let knownWords = () => [];
 
   function track(event, data = {}) {
-    if (!ACTIVE || !user) return;
+    if (!ACTIVE || !user || instructor) return;
     queue.push({ event, t: new Date().toISOString(), u: user.employee_no, ...data });
     if (queue.length > 3000) queue = queue.slice(-3000);
     save(KEY_QUEUE, queue);
@@ -79,13 +83,25 @@ const USO = (() => {
   }
 
   // Huella PBKDF2 de "número:PIN", igual que scripts/generar_acceso.py.
-  async function accesoValido(numero, pin) {
-    if (typeof ACCESO === "undefined" || !(crypto && crypto.subtle)) return false;
+  async function huella(numero, pin) {
     const enc = new TextEncoder();
     const clave = await crypto.subtle.importKey("raw", enc.encode(`${numero}:${pin}`), "PBKDF2", false, ["deriveBits"]);
     const bits = await crypto.subtle.deriveBits({ name: "PBKDF2", hash: "SHA-256", salt: enc.encode(ACCESO.sal), iterations: ACCESO.iteraciones }, clave, 256);
-    const hex = [...new Uint8Array(bits)].map((b) => b.toString(16).padStart(2, "0")).join("").slice(0, ACCESO.largo);
-    return ACCESO.huellas.includes(hex);
+    return [...new Uint8Array(bits)].map((b) => b.toString(16).padStart(2, "0")).join("").slice(0, ACCESO.largo);
+  }
+
+  async function activarInstructor() {
+    const clave = new URLSearchParams(location.search).get("instructor");
+    if (!clave || typeof ACCESO === "undefined" || !ACCESO.instructor || !(crypto && crypto.subtle)) return;
+    history.replaceState(null, "", location.pathname + location.hash); // que la clave no quede en la barra de direcciones
+    if ((await huella("instructor", clave)) !== ACCESO.instructor) return;
+    instructor = true;
+    save(KEY_INSTR, true);
+  }
+
+  async function accesoValido(numero, pin) {
+    if (typeof ACCESO === "undefined" || !(crypto && crypto.subtle)) return false;
+    return ACCESO.huellas.includes(await huella(numero, pin));
   }
 
   function askEmployeeNumber() {
@@ -151,9 +167,11 @@ const USO = (() => {
     };
   }
 
-  function start(options = {}) {
+  async function start(options = {}) {
     if (!ACTIVE) return;
     if (options.knownWords) knownWords = options.knownWords;
+    await activarInstructor();
+    if (instructor) return window.dispatchEvent(new Event("uso-login")); // sin PIN ni registro
     if (!user) askEmployeeNumber();
     else {
       track("open");
@@ -172,10 +190,21 @@ const USO = (() => {
 
   // Nombre del colega en pantalla y botón para salir (cerrar su sesión; sirve también en celulares compartidos).
   function badge() {
+    if (ACTIVE && instructor) return `<div class="uso-badge"><span>🧑‍🏫 Modo instructor (sin registro)</span><button type="button" class="uso-exit" data-uso-instructor-off>Salir</button></div>`;
     if (!ACTIVE || !user) return "";
     const who = user.full_name || `Colaborador ${user.employee_no}`;
     return `<div class="uso-badge"><span>👤 ${escape(who)}</span><button type="button" class="uso-exit" data-uso-logout>🚪 Salir</button></div>`;
   }
+
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest("[data-uso-instructor-off]")) return;
+    if (!confirm("¿Salir del modo instructor en este dispositivo?\n\nPara volver a entrar usa tu enlace de instructor.")) return;
+    instructor = false;
+    save(KEY_INSTR, false);
+    location.hash = "#/";
+    if (!user) askEmployeeNumber();
+    window.dispatchEvent(new Event("uso-login"));
+  });
 
   // Salir: manda lo pendiente y vuelve a la pantalla de bienvenida (pide el número otra vez).
   document.addEventListener("click", async (e) => {
