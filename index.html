@@ -6,33 +6,110 @@
   <meta name="theme-color" content="#1f6f5c">
   <!-- App interna: que no aparezca en buscadores -->
   <meta name="robots" content="noindex, nofollow">
-  <title>English for Waiters</title>
+  <title>Restaurant Service Excellence App</title>
   <link rel="stylesheet" href="css/styles.css">
   <!-- Instalar en el celular como app (manifest.webmanifest) -->
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="images/app/icon-192.png">
   <link rel="apple-touch-icon" href="images/app/apple-touch-icon.png">
   <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Waiters English">
+  <meta name="apple-mobile-web-app-title" content="Restaurant Excellence">
+  <!-- Pantalla de bienvenida: cae una gota de vino y hace ondas; de ahí salen la campana y los cubiertos, y después el nombre de la app (se quita sola) -->
+  <style>
+    .splash { position: fixed; inset: 0; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center;
+      background: radial-gradient(circle at 50% 38%, #2f9c82 0%, #1f6f5c 45%, #0d3a30 100%); color: #fff;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; transition: opacity .55s ease, transform .55s ease; overflow: hidden; }
+    .splash.fuera { opacity: 0; transform: scale(1.06); pointer-events: none; }
+    .splash-logo { position: relative; width: 210px; height: 210px; animation: sp-emerge 1s cubic-bezier(.2, 1.4, .4, 1) .4s both; }
+    .splash-logo::before { content: ""; position: absolute; inset: 10px; border-radius: 50%; border: 2px solid rgba(255, 255, 255, .55);
+      animation: sp-onda 1.6s ease-out .75s both; }
+    .splash-logo svg { width: 100%; height: 100%; overflow: visible; filter: drop-shadow(0 10px 22px rgba(3, 25, 20, .5)); }
+    .sp-centro { transform-origin: 256px 346px; animation: sp-crece .7s cubic-bezier(.3, 1.5, .5, 1) .65s both; }
+    .sp-izq { transform-origin: 256px 346px; animation: sp-izq .75s cubic-bezier(.3, 1.4, .5, 1) .9s both; }
+    .sp-der { transform-origin: 256px 346px; animation: sp-der .75s cubic-bezier(.3, 1.4, .5, 1) .9s both; }
+    .sp-agua { stroke-dasharray: 260; animation: sp-dibuja .8s ease-out 1.15s both; }
+    /* Destello de luz cuando la estrella llega a la campana */
+    .sp-luz { transform-origin: 256px 110px; animation: sp-luz 1.1s ease-out 2.05s both; }
+    .sp-rayos { transform-origin: 256px 110px; animation: sp-rayos 1s ease-out 2.1s both; }
+    .sp-chispas { transform-origin: 256px 110px; animation: sp-chispas 1.2s ease-out 2.15s both; }
+    .splash::after { content: ""; position: absolute; inset: 0; pointer-events: none; opacity: 0;
+      background: radial-gradient(circle at 50% 40%, rgba(255, 244, 205, .55), rgba(255, 244, 205, 0) 60%); animation: sp-brillo 1s ease-out 2.08s both; }
+    @keyframes sp-luz { 0% { transform: scale(0); opacity: 0; } 25% { opacity: 1; } 100% { transform: scale(1.7); opacity: 0; } }
+    @keyframes sp-rayos { 0% { transform: scale(.3) rotate(-15deg); opacity: 0; } 30% { opacity: 1; } 100% { transform: scale(1.6) rotate(20deg); opacity: 0; } }
+    @keyframes sp-chispas { 0% { transform: scale(.2); opacity: 0; } 35% { opacity: 1; } 100% { transform: scale(1.5) rotate(30deg); opacity: 0; } }
+    @keyframes sp-brillo { 0% { opacity: 0; } 20% { opacity: 1; } 100% { opacity: 0; } }
+    .sp-estrella { transform-origin: 256px 110px; animation: sp-estrella .8s cubic-bezier(.3, 1.6, .5, 1) 1.4s both, sp-brilla 1.4s ease-in-out 2.2s infinite; }
+    .splash-nombre { margin-top: 6px; text-align: center; }
+    .splash-nombre b { display: block; font-size: 30px; font-weight: 800; letter-spacing: .5px; animation: sp-texto .7s ease-out 1.75s both; }
+    .splash-nombre span { display: block; margin-top: 4px; font-size: 15px; font-weight: 600; letter-spacing: 6px; text-transform: uppercase; color: #f2c96b;
+      animation: sp-texto .7s ease-out 2s both; }
+    .splash-linea { width: 0; height: 2px; margin: 14px auto 0; border-radius: 2px; background: #f2c96b; animation: sp-linea .8s ease-out 2.25s both; }
+    /* Gota de vino: cae al centro de la campana y abre ondas que cruzan la pantalla */
+    .splash-agua { position: absolute; left: 50%; top: calc(50% - 43px); width: 0; height: 0; pointer-events: none; }
+    .sp-gota { position: absolute; left: -12px; top: -38px; width: 24px; height: 34px; border-radius: 50% 50% 50% 50% / 62% 62% 38% 38%;
+      background: radial-gradient(circle at 35% 62%, #ffd9e0 0 14%, #c0395f 34%, #7a1433 78%); box-shadow: 0 0 14px rgba(255, 190, 205, .75);
+      animation: sp-cae .42s cubic-bezier(.55, 0, 1, .45) both; }
+    .sp-anillo { position: absolute; left: -60px; top: -60px; width: 120px; height: 120px; border-radius: 50%; opacity: 0;
+      border: 2px solid rgba(255, 240, 205, .85); box-shadow: 0 0 10px rgba(255, 225, 165, .55), inset 0 0 12px rgba(255, 225, 165, .45);
+      animation: sp-anillo 2s cubic-bezier(.2, .6, .35, 1) .42s both; }
+    .sp-anillo:nth-child(4) { animation-delay: .62s; border-width: 3px; }
+    .sp-anillo:nth-child(5) { animation-delay: .84s; }
+    .sp-anillo:nth-child(6) { animation-delay: 1.08s; border-width: 1.5px; }
+    .sp-salpica { position: absolute; left: -40px; top: -40px; width: 80px; height: 80px; border-radius: 50%; opacity: 0;
+      background: radial-gradient(circle, rgba(255, 255, 255, .9), rgba(255, 225, 165, .35) 45%, rgba(255, 225, 165, 0) 70%);
+      animation: sp-salpica .6s ease-out .4s both; }
+    @keyframes sp-cae { 0% { transform: translateY(-60vh) scaleY(1.3); opacity: 0; } 15% { opacity: 1; } 90% { transform: translateY(0) scaleY(1.15); opacity: 1; }
+      100% { transform: translateY(6px) scale(1.6, .3); opacity: 0; } }
+    @keyframes sp-anillo { 0% { transform: scale(.08); opacity: 0; } 12% { opacity: .95; } 100% { transform: scale(9); opacity: 0; } }
+    @keyframes sp-salpica { 0% { transform: scale(.2); opacity: 0; } 30% { opacity: 1; } 100% { transform: scale(2.2); opacity: 0; } }
+    @keyframes sp-emerge { from { transform: translateY(40px) scale(.4); opacity: 0; } }
+    @keyframes sp-onda { 0% { transform: scale(.6); opacity: 0; } 30% { opacity: 1; } 100% { transform: scale(1.7); opacity: 0; } }
+    @keyframes sp-crece { from { transform: scaleY(0); opacity: 0; } }
+    @keyframes sp-izq { from { transform: rotate(40deg) scale(.6); opacity: 0; } }
+    @keyframes sp-der { from { transform: rotate(-40deg) scale(.6); opacity: 0; } }
+    @keyframes sp-dibuja { from { stroke-dashoffset: 260; } to { stroke-dashoffset: 0; } }
+    @keyframes sp-estrella { from { transform: translateY(-90px) rotate(-180deg) scale(0); opacity: 0; } }
+    @keyframes sp-brilla { 50% { filter: drop-shadow(0 0 14px #ffe39a) drop-shadow(0 0 4px #fff); } }
+    @keyframes sp-texto { from { transform: translateY(16px); opacity: 0; } }
+    @keyframes sp-linea { to { width: 120px; } }
+    @media (prefers-reduced-motion: reduce) { .splash-agua { display: none; } .splash *, .splash *::before { animation-duration: .01s !important; animation-delay: 0s !important; } }
+  </style>
 </head>
 <body>
+  <div class="splash" id="splash" aria-hidden="true">
+    <div class="splash-agua"><span class="sp-gota"></span><span class="sp-salpica"></span><span class="sp-anillo"></span><span class="sp-anillo"></span><span class="sp-anillo"></span><span class="sp-anillo"></span></div>
+    <div class="splash-logo">
+      <svg viewBox="0 0 512 512">
+        <g fill="#fff">
+          <!-- Campana de servicio con su asa -->
+          <path class="sp-centro" d="M136 322a120 120 0 0 1 240 0zM256 172a20 20 0 1 1-.01 0z"/>
+          <!-- Tenedor -->
+          <path class="sp-izq" d="M58 176h9v48h8v-48h9v48h8v-48h9v62a20 20 0 0 1-14 19v143a9 9 0 0 1-18 0V257a20 20 0 0 1-14-19z"/>
+          <!-- Cuchillo -->
+          <path class="sp-der" d="M430 176c22 14 30 52 30 104h-14v120a9 9 0 0 1-18 0V180a3 3 0 0 1 2-4z"/>
+        </g>
+        <!-- Charola -->
+        <path class="sp-agua" d="M124 350h264" stroke="#fff" stroke-width="16" fill="none" stroke-linecap="round"/>
+        <defs><radialGradient id="sp-luz"><stop offset="0" stop-color="#fffbe8"/><stop offset=".35" stop-color="#ffe7a3" stop-opacity=".85"/><stop offset="1" stop-color="#ffe39a" stop-opacity="0"/></radialGradient></defs>
+        <circle class="sp-luz" cx="256" cy="110" r="130" fill="url(#sp-luz)"/>
+        <g class="sp-rayos" stroke="#fff1bd" stroke-width="7" stroke-linecap="round"><line x1="304" y1="110" x2="352" y2="110"/><line x1="298" y1="134" x2="322" y2="148"/><line x1="280" y1="152" x2="304" y2="193"/><line x1="256" y1="158" x2="256" y2="186"/><line x1="232" y1="152" x2="208" y2="193"/><line x1="214" y1="134" x2="190" y2="148"/><line x1="208" y1="110" x2="160" y2="110"/><line x1="214" y1="86" x2="190" y2="72"/><line x1="232" y1="68" x2="208" y2="27"/><line x1="256" y1="62" x2="256" y2="34"/><line x1="280" y1="68" x2="304" y2="27"/><line x1="298" y1="86" x2="322" y2="72"/></g>
+        <g class="sp-chispas" fill="#fff6d2"><circle cx="367" cy="157" r="6"/><circle cx="203" cy="201" r="5"/><circle cx="128" cy="89" r="4"/><circle cx="243" cy="-4" r="6"/><circle cx="334" cy="47" r="4"/><circle cx="307" cy="240" r="4"/></g>
+        <path class="sp-estrella" d="M256 70l13 27 30 4-22 21 5 30-26-14-26 14 5-30-22-21 30-4z" fill="#f2c96b"/>
+      </svg>
+    </div>
+    <div class="splash-nombre"><b>Restaurant Service</b><span>Excellence App</span><div class="splash-linea"></div></div>
+  </div>
+  <script>
+    // Se quita sola a los 3.7 s (o al tocarla).
+    (function () {
+      var s = document.getElementById("splash"), listo = false;
+      function quitar() { if (listo) return; listo = true; s.classList.add("fuera"); setTimeout(function () { s.remove(); }, 600); }
+      s.addEventListener("click", quitar);
+      setTimeout(quitar, 3700);
+    })();
+  </script>
   <main id="app" class="container"></main>
 
-  <nav class="tabbar" aria-label="Menú principal">
-    <div class="nav-brand">
-      <span class="nav-mark">EW</span>
-      <span class="nav-brand-text"><strong>English for Waiters</strong><small>Inglés de servicio · Restaurantes</small></span>
-    </div>
-    <p class="nav-section">Estudiar</p>
-    <a href="#/"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M3.5 11 12 4l8.5 7M6 9.5V20h4.5v-5.5h3V20H18V9.5"/></svg><span class="nav-label">Inicio</span></a>
-    <a href="#/vocab"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v15H5.5A1.5 1.5 0 0 0 4 20.5zM20 5.5A1.5 1.5 0 0 0 18.5 4H13v15h5.5a1.5 1.5 0 0 1 1.5 1.5zM11 19h2"/></svg><span class="nav-label">Vocabulario</span></a>
-    <a href="#/frases"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h11v8H8l-4 3.5zM15 9h5v8h-1v3l-3.5-3H10v-4"/></svg><span class="nav-label">Frases</span></a>
-    <a href="#/menu"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v18H6z"/><path d="M9 7.5h6M9 11h6M9 14.5h4"/></svg><span class="nav-label">Menús</span></a>
-    <a href="#/vinos"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 3h8c0 4.5-1.5 8-4 8s-4-3.5-4-8zM12 11v9M8.5 21h7M8.3 6.5h7.4"/></svg><span class="nav-label">Vinos</span></a>
-    <a href="#/script"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h10v4H7zM5 7h14v14H5z"/><path d="M8.5 11.5h7M8.5 14.5h7M8.5 17.5h4"/></svg><span class="nav-label">Service Script</span></a>
-    <a href="#/practicar"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="1"/></svg><span class="nav-label">Practicar</span></a>
-    <p class="nav-foot">Estándares AAA · Hotelería</p>
-  </nav>
 
   <script src="js/data.js"></script>
   <!-- Menús y vinos reales del hotel; si no existe, la app usa el menú de ejemplo -->

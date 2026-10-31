@@ -190,28 +190,35 @@ const colorTile = ({ href, i, icon, title, sub = "", meta = "", attrs = "" }) =>
   </${href ? "a" : "button"}>`;
 
 // ---------- Vistas ----------
+// Imagen para una frase: la de la palabra del vocabulario que aparece en ella (primero las palabras más
+// largas, para que "wine list" gane sobre "wine" y "kitchen" sobre "check"; a igual largo, las de Canva).
+const WORDS_WITH_PHOTO = ALL_WORDS.filter((w) => PHOTOS[w.en]);
+function phraseImage(en) {
+  let best = null;
+  for (const w of WORDS_WITH_PHOTO) {
+    for (const t of w.en.split("/").map((x) => x.trim())) {
+      if (t.length < 3 || /^to /i.test(t)) continue;
+      if (!new RegExp(`\\b${t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}(s|es)?\\b`, "i").test(en)) continue;
+      const canva = PHOTOS[w.en].source === "canva";
+      if (!best || t.length > best.len || (t.length === best.len && canva && !best.canva)) best = { word: w, photo: PHOTOS[w.en], len: t.length, canva };
+    }
+  }
+  return best;
+}
+// Solo frases que tienen una imagen relacionada (si ninguna tuviera, cualquiera).
+const PHRASES_WITH_IMAGE = ALL_PHRASES.filter((p) => phraseImage(p.en));
+
 function viewHome() {
-  const tip = ALL_PHRASES[Math.floor(Math.random() * ALL_PHRASES.length)];
+  const pool = PHRASES_WITH_IMAGE.length ? PHRASES_WITH_IMAGE : ALL_PHRASES;
+  const tip = pool[Math.floor(Math.random() * pool.length)];
+  const tipImg = phraseImage(tip.en);
   const pct = Math.round((known.size / ALL_WORDS.length) * 100);
   const best = store.get("bestQuiz", null);
   return `
     ${USO.badge()}
     <section class="hero">
-      <h1>English for Waiters</h1>
+      <h1>Restaurant Service Excellence App</h1>
       <p>Estudia a tu ritmo el inglés que usas en el servicio.</p>
-    </section>
-
-    <section class="card">
-      <h2>Tu progreso</h2>
-      <div class="progress"><div style="width:${pct}%"></div></div>
-      <p class="muted">${known.size} de ${ALL_WORDS.length} palabras marcadas como aprendidas${best !== null ? ` · Mejor quiz: ${best}/10` : ""}</p>
-    </section>
-
-    <section class="card tip">
-      <h2>Frase del día</h2>
-      <p class="en big">${esc(tip.en)}</p>
-      <p class="muted">${esc(tip.es)}</p>
-      <div class="row">${speakButtons(tip.en)}</div>
     </section>
 
     <nav class="rest-grid home-grid">
@@ -226,7 +233,23 @@ function viewHome() {
       ]
         .map(([href, key, title, sub], i) => colorTile({ href, i, icon: MENU_ICONS[key], title, sub }))
         .join("")}
-    </nav>`;
+    </nav>
+
+    <section class="card">
+      <h2>Tu progreso</h2>
+      <div class="progress"><div style="width:${pct}%"></div></div>
+      <p class="muted">${known.size} de ${ALL_WORDS.length} palabras marcadas como aprendidas${best !== null ? ` · Mejor quiz: ${best}/10` : ""}</p>
+    </section>
+
+    <section class="card tip ${tipImg ? "has-img" : ""}">
+      ${tipImg ? `<img class="tip-img" src="${esc(tipImg.photo.src)}" alt="${esc(tipImg.word.en)}" data-zoom="${esc(tipImg.word.en)}">` : ""}
+      <div class="tip-text">
+        <h2>Frase del día</h2>
+        <p class="en big">${tipImg ? highlight(tip.en, tipImg.word.en) : esc(tip.en)}</p>
+        <p class="muted">${esc(tip.es)}</p>
+        <div class="row">${speakButtons(tip.en)}</div>
+      </div>
+    </section>`;
 }
 
 let currentWords = [];
@@ -927,11 +950,12 @@ function render() {
   const view = ROUTES[route] || viewHome;
   session = null;
   const param0 = params[0] && decodeURIComponent(params[0]);
-  $("#app").innerHTML = view(...params.map(decodeURIComponent));
+  // Fuera de Inicio, una barra arriba para regresar a los recuadros (ya no hay menú principal aparte).
+  const homeBar = route
+    ? `<header class="home-bar"><a href="#/" class="home-back">← Inicio</a><span class="home-brand"><span class="nav-mark">RS</span>Restaurant Service</span></header>`
+    : "";
+  $("#app").innerHTML = homeBar + view(...params.map(decodeURIComponent));
   trackView(route, param0, params[1]);
-  document.querySelectorAll(".tabbar a").forEach((a) => {
-    a.classList.toggle("active", a.getAttribute("href") === `#/${route}`);
-  });
   const wordsStart = route === "vocab" && params[0] ? $("#words-start") : null;
   if (wordsStart) wordsStart.scrollIntoView();
   else window.scrollTo(0, 0);
