@@ -168,7 +168,6 @@ const paint = (i) => `--c1:${PALETTE[i % PALETTE.length][0]};--c2:${PALETTE[i % 
 const svgIcon = (d) => `<svg viewBox="0 0 24 24" aria-hidden="true">${d}</svg>`;
 const MENU_ICONS = {
   vocab: '<path d="M4 5.5A1.5 1.5 0 0 1 5.5 4H11v15H5.5A1.5 1.5 0 0 0 4 20.5zM20 5.5A1.5 1.5 0 0 0 18.5 4H13v15h5.5a1.5 1.5 0 0 1 1.5 1.5zM11 19h2"/>',
-  alimentos: '<path d="M12 7c-1.5-2-6-2.5-7 1.5S6.5 20 9 20c1.3 0 1.8-.6 3-.6s1.7.6 3 .6c2.5 0 5-7.5 4-11.5S13.5 5 12 7z"/><path d="M12 7c0-2 1-3.5 2.5-4"/>',
   frases: '<path d="M4 5h11v8H8l-4 3.5zM15 9h5v8h-1v3l-3.5-3H10v-4"/>',
   menu: '<path d="M6 3h12v18H6z"/><path d="M9 7.5h6M9 11h6M9 14.5h4"/>',
   vinos: '<path d="M8 3h8c0 4.5-1.5 8-4 8s-4-3.5-4-8zM12 11v9M8.5 21h7M8.3 6.5h7.4"/>',
@@ -223,8 +222,7 @@ function viewHome() {
 
     <nav class="rest-grid home-grid">
       ${[
-        ["#/vocab", "vocab", "Vocabulario", "Palabras con audio e imagen"],
-        ["#/alimentos", "alimentos", "Alimentos y bebidas", "Frutas, carnes, bebidas…"],
+        ["#/vocab", "vocab", "Vocabulario", "Servicio, alimentos y bebidas"],
         ["#/frases", "frases", "Frases de servicio", "Por etapa del servicio"],
         ["#/menu", "menu", "Menús", "Restaurantes del hotel"],
         ["#/vinos", "vinos", "Carta de vinos", "Uva, maridaje y venta"],
@@ -346,14 +344,6 @@ function wordList(words) {
     </article>`
     )
     .join("");
-}
-
-function viewFood() {
-  return `
-    <h1>Alimentos y bebidas</h1>
-    <p class="muted">Ingredientes y bebidas en inglés. Elige una categoría para estudiarla o practicarla.</p>
-    ${categoryCards(vocabGroup("alimentos"))}
-    <a class="btn full center" href="#/practicar">🎯 Practicar estas categorías</a>`;
 }
 
 function viewPhrases() {
@@ -500,6 +490,8 @@ function viewMenu(restId, menuIdx) {
     <p class="muted">🔊 escuchar el platillo completo · 🐢 escucharlo despacio</p>
     ${menuChips}
     ${sections}
+    <a class="btn ghost full center" href="#/menu">← Volver a los restaurantes</a>
+    <a class="float-back" href="#/menu" aria-label="Volver a los restaurantes">← Restaurantes</a>
     </div>`;
 }
 
@@ -797,7 +789,17 @@ function currentOptions() {
   return session.options;
 }
 
+// Cada pantalla de práctica lleva arriba la barra para regresar al menú de Practicar o a Inicio.
 function renderSession() {
+  drawSession();
+  $("#app").insertAdjacentHTML(
+    "afterbegin",
+    `<header class="home-bar"><button type="button" class="home-back" data-back-practice>← Practicar</button><a href="#/" class="home-brand">🏠 Inicio</a></header>`
+  );
+  window.scrollTo(0, 0);
+}
+
+function drawSession() {
   const s = session;
   const app = $("#app");
   if (s.index >= s.deck.length) {
@@ -816,7 +818,7 @@ function renderSession() {
         <h2>${msg}</h2>
         <div class="row center">
           <button class="btn" id="again">Otra ronda</button>
-          <a class="btn ghost" href="#/practicar">Cambiar modo</a>
+          <button type="button" class="btn ghost" data-back-practice>Cambiar modo</button>
         </div>
       </section>`;
     $("#again").onclick = () => startSession(s.mode, s.poolKey);
@@ -919,7 +921,7 @@ function renderSession() {
 const ROUTES = {
   "": viewHome,
   vocab: viewVocab,
-  alimentos: viewFood,
+  alimentos: viewVocab, // enlaces guardados de cuando era un recuadro aparte
   frases: viewPhrases,
   menu: viewMenu,
   vinos: viewWines,
@@ -940,7 +942,7 @@ function trackView(route, p0, p1) {
     const rest = HOTEL_DATA.restaurants.find((r) => r.id === p0);
     USO.track("category", { category: rest ? `Menú: ${rest.name}` : "Menús" });
   } else if (route) {
-    const names = { frases: "Frases de servicio", vinos: "Carta de vinos", practicar: "Practicar", alimentos: "Alimentos y bebidas" };
+    const names = { frases: "Frases de servicio", vinos: "Carta de vinos", practicar: "Practicar" };
     if (names[route]) USO.track("category", { category: names[route] });
   }
 }
@@ -1019,6 +1021,9 @@ document.addEventListener("click", (e) => {
     knownBtn.closest(".word").classList.toggle("is-known", isKnown);
     return;
   }
+
+  // Ya estamos en #/practicar, así que cambiar el enlace no volvería a dibujar el menú.
+  if (e.target.closest("[data-back-practice]")) return render();
 
   const modeBtn = e.target.closest("[data-mode]");
   if (modeBtn) startSession(modeBtn.dataset.mode, $("#pool").value);
