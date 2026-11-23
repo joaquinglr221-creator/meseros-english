@@ -45,11 +45,11 @@
   .bad { color: #b4232f; text-decoration: line-through; }
   .good { color: var(--verde); font-weight: 800; }
   .chat p { margin: 0 0 9px; font-size: 19px; }
-  .chat .q::before { content: "Guest: "; font-weight: 800; color: var(--gris); }
-  .chat .a::before { content: "Waiter: "; font-weight: 800; color: var(--vino); }
-  ol.practica { margin: 0; padding-left: 26px; columns: 2; column-gap: 34px; }
+  .chat .q b { color: var(--gris); }
+  .chat .a b { color: var(--vino); }
+  ol.practica { margin: 0; padding-left: 0; list-style: none; columns: 2; column-gap: 34px; }
   ol.practica li { margin: 0 0 12px; font-size: 18px; break-inside: avoid; }
-  .blank { display: inline-block; min-width: 130px; border-bottom: 2px solid var(--tinta); }
+  .blank { letter-spacing: 1px; }
   .portada { background: linear-gradient(135deg, var(--vino) 0%, #4a0c20 100%); color: #fff; justify-content: center; }
   .portada::before { display: none; }
   .portada h1 { color: #fff; font-size: 64px; }
@@ -281,16 +281,16 @@
   <div class="grid g2">
     <div class="card chat">
       <h3 style="margin-bottom:10px">1. The guest wants a light wine</h3>
-      <p class="q">Which one is lighter, the Malbec or the Pinot Noir?</p>
-      <p class="a">The Pinot Noir is lighter. It's more elegant and fresher, with red fruit.</p>
-      <p class="q">Is it good with salmon?</p>
-      <p class="a">Yes, it's a better choice for salmon than the Malbec.</p>
+      <p class="q"><b>Guest:</b> Which one is lighter, the Malbec or the Pinot Noir?</p>
+      <p class="a"><b>Waiter:</b> The Pinot Noir is lighter. It's more elegant and fresher, with red fruit.</p>
+      <p class="q"><b>Guest:</b> Is it good with salmon?</p>
+      <p class="a"><b>Waiter:</b> Yes, it's a better choice for salmon than the Malbec.</p>
     </div>
     <div class="card chat">
       <h3 style="margin-bottom:10px">2. The guest ordered a steak</h3>
-      <p class="q">I'd like a red for my steak. Something not too expensive.</p>
-      <p class="a">I recommend the Kaiken Ultra Malbec. It's more affordable than the Pesquera, and it's richer and fruitier than the Merlot.</p>
-      <p class="q">Perfect, I'll take it.</p>
+      <p class="q"><b>Guest:</b> I'd like a red for my steak. Something not too expensive.</p>
+      <p class="a"><b>Waiter:</b> I recommend the Kaiken Ultra Malbec. It's more affordable than the Pesquera, and it's richer and fruitier than the Merlot.</p>
+      <p class="q"><b>Guest:</b> Perfect, I'll take it.</p>
     </div>
   </div>
   <div class="nota"><b>Para practicar en parejas:</b> uno es el huésped y el otro el mesero. Después cambian de papel y de vinos.</div>
@@ -322,18 +322,18 @@
   <h2>Complete the sentences</h2>
   <p class="lead">Escribe la forma comparativa. Usa la tabla de la página 4.</p>
   <ol class="practica">
-    <li>The Pinot Noir is <span class="blank"></span> (light) than the Malbec.</li>
-    <li>The Zinfandel is <span class="blank"></span> (spicy) than the Merlot.</li>
-    <li>The Barolo is <span class="blank"></span> (tannic) than the Merlot.</li>
-    <li>The Merlot is <span class="blank"></span> (cheap) than the Pinot Noir.</li>
-    <li>The Pesquera is <span class="blank"></span> (expensive) than the Kaiken Malbec.</li>
-    <li>For salmon, the Pinot Noir is <span class="blank"></span> (good) than the Zinfandel.</li>
-    <li>The Zinfandel is a <span class="blank"></span> (big) wine than the Pinot Noir.</li>
-    <li>The Las Nubes 2018 is <span class="blank"></span> (old) than the Rolu 2022.</li>
-    <li>The Merlot is <span class="blank"></span> (smooth) than the Barolo.</li>
-    <li>The Pinot Noir is <span class="blank"></span> (elegant) than the Zinfandel.</li>
-    <li>The Zinfandel is <span class="blank"></span> (ripe) than the Barolo.</li>
-    <li>The Merlot is not <span class="blank"></span> tannic <span class="blank" style="min-width:60px"></span> the Barolo.</li>
+    <li>1. The Pinot Noir is <span class="blank">__________</span> (light) than the Malbec.</li>
+    <li>2. The Zinfandel is <span class="blank">__________</span> (spicy) than the Merlot.</li>
+    <li>3. The Barolo is <span class="blank">__________</span> (tannic) than the Merlot.</li>
+    <li>4. The Merlot is <span class="blank">__________</span> (cheap) than the Pinot Noir.</li>
+    <li>5. The Pesquera is <span class="blank">__________</span> (expensive) than the Kaiken Malbec.</li>
+    <li>6. For salmon, the Pinot Noir is <span class="blank">__________</span> (good) than the Zinfandel.</li>
+    <li>7. The Zinfandel is a <span class="blank">__________</span> (big) wine than the Pinot Noir.</li>
+    <li>8. The Las Nubes 2018 is <span class="blank">__________</span> (old) than the Rolu 2022.</li>
+    <li>9. The Merlot is <span class="blank">__________</span> (smooth) than the Barolo.</li>
+    <li>10. The Pinot Noir is <span class="blank">__________</span> (elegant) than the Zinfandel.</li>
+    <li>11. The Zinfandel is <span class="blank">__________</span> (ripe) than the Barolo.</li>
+    <li>12. The Merlot is not <span class="blank">__________</span> tannic <span class="blank">____</span> the Barolo.</li>
   </ol>
   <span class="num">13</span>
 </section>
@@ -361,18 +361,18 @@
   <p class="kicker">Answer key · Respuestas</p>
   <h2>Practice 1 answers</h2>
   <ol class="practica">
-    <li class="en">lighter</li>
-    <li class="en">spicier</li>
-    <li class="en">more tannic</li>
-    <li class="en">cheaper <span class="es">(o more affordable)</span></li>
-    <li class="en">more expensive</li>
-    <li class="en">better</li>
-    <li class="en">bigger</li>
-    <li class="en">older</li>
-    <li class="en">smoother</li>
-    <li class="en">more elegant</li>
-    <li class="en">riper</li>
-    <li class="en">as … as</li>
+    <li class="en">1. lighter</li>
+    <li class="en">2. spicier</li>
+    <li class="en">3. more tannic</li>
+    <li class="en">4. cheaper <span class="es">(o more affordable)</span></li>
+    <li class="en">5. more expensive</li>
+    <li class="en">6. better</li>
+    <li class="en">7. bigger</li>
+    <li class="en">8. older</li>
+    <li class="en">9. smoother</li>
+    <li class="en">10. more elegant</li>
+    <li class="en">11. riper</li>
+    <li class="en">12. as … as</li>
   </ol>
   <div class="nota"><b>Cierre de la clase:</b> cada mesero dice una comparación de dos vinos de la carta usando una regla distinta: -er, -ier, more/less y better/worse.</div>
   <span class="num">15</span>
