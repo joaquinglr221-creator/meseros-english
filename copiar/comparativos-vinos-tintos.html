@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<title>Comparing Red Wines</title>
+<style>
+  @page { size: 11in 8.5in; margin: 0; }
+  * { box-sizing: border-box; }
+  :root { --vino: #7a1433; --vino2: #a8325a; --oro: #c9973f; --tinta: #231a1d; --gris: #6b6265; --suave: #f8f1ec; --verde: #1f6f5c; }
+  html, body { margin: 0; background: #ddd; }
+  body { font: 18px/1.35 -apple-system, "Helvetica Neue", Arial, sans-serif; color: var(--tinta); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  .slide { width: 11in; height: 8.5in; margin: 0 auto 24px; background: #fff; position: relative; overflow: hidden; padding: .55in .7in .5in; display: flex; flex-direction: column; page-break-after: always; break-after: page; }
+  @media print { html, body { background: #fff; } .slide { margin: 0; } }
+  .slide::before { content: ""; position: absolute; left: 0; top: 0; bottom: 0; width: .22in; background: linear-gradient(var(--vino), var(--vino2)); }
+  .num { position: absolute; right: .5in; bottom: .3in; color: var(--gris); font-size: 13px; }
+  h1 { margin: 0 0 6px; font-size: 40px; line-height: 1.1; color: var(--vino); }
+  h2 { margin: 0 0 4px; font-size: 34px; color: var(--vino); }
+  .kicker { margin: 0 0 14px; font-size: 15px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--oro); }
+  .lead { font-size: 20px; color: var(--gris); margin: 0 0 18px; }
+  .en { font-weight: 700; }
+  .es { color: var(--gris); font-size: .86em; }
+  mark { background: #ffe3a1; color: inherit; padding: 0 3px; border-radius: 4px; font-weight: 800; }
+  .grid { display: grid; gap: 14px; }
+  .g2 { grid-template-columns: 1fr 1fr; } .g3 { grid-template-columns: repeat(3, 1fr); }
+  .card { background: var(--suave); border-radius: 14px; padding: 14px 16px; }
+  .card h3 { margin: 0 0 4px; font-size: 19px; color: var(--vino); line-height: 1.2; }
+  .meta { font-size: 14px; color: var(--gris); margin-bottom: 6px; }
+  .price { float: right; font-weight: 800; color: var(--verde); font-size: 17px; }
+  .card p { margin: 0; font-size: 15px; }
+  .rule { display: flex; gap: 18px; align-items: center; background: var(--vino); color: #fff; border-radius: 14px; padding: 14px 20px; margin-bottom: 16px; }
+  .rule b { font-size: 26px; white-space: nowrap; }
+  .rule span { font-size: 18px; opacity: .92; }
+  table { border-collapse: collapse; width: 100%; }
+  th, td { text-align: left; padding: 7px 10px; border-bottom: 1px solid #eadfd8; font-size: 17px; vertical-align: top; }
+  th { font-size: 13px; letter-spacing: .06em; text-transform: uppercase; color: var(--gris); border-bottom: 2px solid var(--vino); }
+  td.c { text-align: center; } th.c { text-align: center; }
+  .dots { color: var(--vino); letter-spacing: 2px; font-size: 15px; white-space: nowrap; }
+  .dots i { color: #e4d6d0; font-style: normal; }
+  .ex { margin: 0 0 10px; font-size: 20px; }
+  .ex .es { display: block; font-size: 15px; }
+  .nota { margin-top: auto; background: #eef6f3; border-left: 5px solid var(--verde); border-radius: 8px; padding: 10px 14px; font-size: 15px; }
+  .nota b { color: var(--verde); }
+  .formula { font-size: 24px; font-weight: 800; background: var(--suave); border-radius: 12px; padding: 12px 18px; margin-bottom: 14px; }
+  .formula small { font-weight: 400; color: var(--gris); font-size: 16px; }
+  .bad { color: #b4232f; text-decoration: line-through; }
+  .good { color: var(--verde); font-weight: 800; }
+  .chat p { margin: 0 0 9px; font-size: 19px; }
+  .chat .q::before { content: "Guest: "; font-weight: 800; color: var(--gris); }
+  .chat .a::before { content: "Waiter: "; font-weight: 800; color: var(--vino); }
+  ol.practica { margin: 0; padding-left: 26px; columns: 2; column-gap: 34px; }
+  ol.practica li { margin: 0 0 12px; font-size: 18px; break-inside: avoid; }
+  .blank { display: inline-block; min-width: 130px; border-bottom: 2px solid var(--tinta); }
+  .portada { background: linear-gradient(135deg, var(--vino) 0%, #4a0c20 100%); color: #fff; justify-content: center; }
+  .portada::before { display: none; }
+  .portada h1 { color: #fff; font-size: 64px; }
+  .portada .kicker { color: #f2c96b; }
+  .portada p { font-size: 24px; margin: 6px 0; opacity: .92; }
+  .portada .copas { font-size: 70px; margin-bottom: 10px; }
+  .sil { display: inline-block; background: #fff; color: var(--vino); border-radius: 99px; padding: 1px 10px; font-weight: 800; font-size: 14px; margin-left: 6px; vertical-align: 3px; }
+  /* Copiar: en pantalla un botón; en el PDF un enlace a la página publicada, que copia la diapositiva al abrirse */
+  .copiar { position: absolute; top: .3in; right: .45in; z-index: 3; font: 700 15px -apple-system, Arial, sans-serif; color: #fff; background: var(--verde);
+    border: 0; border-radius: 99px; padding: 7px 16px; cursor: pointer; text-decoration: none; }
+  .copiar.ok { background: #2f8a4c; }
+  a.copiar { display: none; }
+  .portada .copiar { background: #fff; color: var(--vino); }
+  .slide.hecho::after { content: "✓ copiada"; position: absolute; top: .36in; right: 1.75in; font: 700 13px -apple-system, Arial, sans-serif; color: #2f8a4c; }
+  .slide:target { outline: 6px solid #ffd76a; outline-offset: -6px; }
+  .leyendo .copiar, .leyendo .num { display: none !important; }
+  .aviso { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 9; background: var(--verde); color: #fff; font-weight: 700; padding: 12px 20px; border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,.25); max-width: 90vw; }
+  .barra { max-width: 11in; margin: 0 auto 12px; padding: 14px 4px 0; font: 15px -apple-system, Arial, sans-serif; color: #333; }
+  .barra button { font: inherit; background: none; border: 1px solid #aaa; border-radius: 99px; padding: 3px 12px; margin-left: 8px; cursor: pointer; }
+  @media print { button.copiar, .barra, .aviso { display: none !important; } a.copiar { display: inline-block; } .slide.hecho::after { display: none; } }
+</style>
+</head>
+<body>
+<div class="barra"><b id="avance"></b> · Cada diapositiva tiene su botón Copiar: pega el texto en Canva con Cmd+V. <button id="reiniciar" type="button">Quitar marcas</button></div>
+
+<!-- 1 -->
+<section class="slide portada" id="copiar-1">
+  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-1">Copiar</a>
+  <div class="copas">🍷🍷</div>
+  <p class="kicker">English for Waiters · Wine Service</p>
+  <h1>Comparing Red Wines</h1>
+  <p>Comparative adjectives: <b>lighter</b>, <b>spicier</b>, <b>more elegant</b>, <b>better</b></p>
+  <p style="font-size:19px;margin-top:22px">Adjetivos comparativos para describir y recomendar los vinos tintos de nuestra carta</p>
+</section>
+
+<!-- 2 -->
+<section class="slide" id="copiar-2">
+  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-2">Copiar</a>
+  <p class="kicker">Today's goal · Objetivo</p>
+  <h2>By the end of the class you can…</h2>
+  <p class="lead">Al terminar la clase, el mesero podrá:</p>
+  <div class="grid g2">
+    <div class="card"><h3>1. Compare two wines</h3><p class="en">"The Pinot Noir is lighter than the Malbec."</p><p class="es">Comparar dos vinos de la carta.</p></div>
+    <div class="card"><h3>2. Choose the right form</h3><p class="en">light → lighter · spicy → spicier · elegant → more elegant</p><p class="es">Saber cuándo usar -er, -ier o more, según las sílabas.</p></div>
+    <div class="card"><h3>3. Answer a guest's question</h3><p class="en">"Which one is softer?"</p><p class="es">Responder cuando el huésped duda entre dos vinos.</p></div>
+    <div class="card"><h3>4. Recommend with confidence</h3><p class="en">"For salmon, the Pinot Noir is a better choice."</p><p class="es">Usar better y worse para recomendar.</p></div>
+  </div>
+  <div class="nota"><b>Para el instructor:</b> los 6 vinos de la clase son de nuestra carta de tintos. Sus características vienen de la ficha de cada uno y del estilo típico de su uva.</div>
+  <span class="num">2</span>
+</section>
+
+<!-- 3 -->
+<section class="slide" id="copiar-3">
+  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-3">Copiar</a>
+  <p class="kicker">Our red wines · Nuestros tintos</p>
+  <h2>Six wines from our wine list</h2>
+  <p class="lead">Seis tintos de la carta con estilos muy distintos.</p>
+  <div class="grid g3">
+    <div class="card"><span class="price">$50</span><h3>Casa Blanca Cefiro Reserva Merlot</h3><div class="meta">Chile · Merlot</div><p>Smooth, round red with ripe fruit (plum, cherry) and soft tannins.</p></div>
+    <div class="card"><span class="price">$90</span><h3>Kaiken Ultra Malbec</h3><div class="meta">Argentina · Malbec</div><p>Intense red with ripe black fruit and a velvety texture.</p></div>
+    <div class="card"><span class="price">$100</span><h3>Manuel Olivier Bourgogne Pinot Noir</h3><div class="meta">France · Pinot Noir</div><p>Light to medium-bodied, elegant red with fresh red fruit and lively acidity.</p></div>
+    <div class="card"><span class="price">$120</span><h3>Riva Leone Barolo</h3><div class="meta">Italy · Nebbiolo</div><p>Red with high tannins and acidity, notes of rose, cherry and tar; great aging potential.</p></div>
+    <div class="card"><span class="price">$130</span><h3>Pesquera Reserva</h3><div class="meta">Spain · Tempranillo</div><p>Medium to full-bodied red with red fruit and spice; oak adds vanilla and tobacco notes.</p></div>
+    <div class="card"><span class="price">$250</span><h3>Caymus Zinfandel</h3><div class="meta">USA · Zinfandel</div><p>Red with very ripe fruit and spice, high in alcohol and body.</p></div>
+  </div>
+  <div class="nota"><b>Precios</b> por botella de 750 ml, en dólares, según la carta.</div>
+  <span class="num">3</span>
+</section>
+
+<!-- 4 -->
+<section class="slide" id="copiar-4">
+  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-4">Copiar</a>
+  <p class="kicker">Side by side · Lado a lado</p>
+  <h2>How are they different?</h2>
+  <p class="lead">Más puntos = más de esa característica.</p>
+  <table>
+    <tr><th>Wine</th><th class="c">Body<br><span style="text-transform:none">cuerpo</span></th><th class="c">Tannins<br><span style="text-transform:none">taninos</span></th><th class="c">Acidity<br><span style="text-transform:none">acidez</span></th><th class="c">Ripe fruit<br><span style="text-transform:none">fruta madura</span></th><th class="c">Price</th></tr>
+    <tr><td class="en">Merlot</td><td class="c dots">●●●<i>●●</i></td><td class="c dots">●●<i>●●●</i></td><td class="c dots">●●<i>●●●</i></td><td class="c dots">●●●<i>●●</i></td><td class="c">$50</td></tr>
+    <tr><td class="en">Malbec</td><td class="c dots">●●●●<i>●</i></td><td class="c dots">●●●<i>●●</i></td><td class="c dots">●●<i>●●●</i></td><td class="c dots">●●●●<i>●</i></td><td class="c">$90</td></tr>
+    <tr><td class="en">Pinot Noir</td><td class="c dots">●●<i>●●●</i></td><td class="c dots">●<i>●●●●</i></td><td class="c dots">●●●●<i>●</i></td><td class="c dots">●●<i>●●●</i></td><td class="c">$100</td></tr>
+    <tr><td class="en">Barolo</td><td class="c dots">●●●●<i>●</i></td><td class="c dots">●●●●●</td><td class="c dots">●●●●●</td><td class="c dots">●●<i>●●●</i></td><td class="c">$120</td></tr>
+    <tr><td class="en">Pesquera (Tempranillo)</td><td class="c dots">●●●●<i>●</i></td><td class="c dots">●●●<i>●●</i></td><td class="c dots">●●●<i>●●</i></td><td class="c dots">●●●<i>●●</i></td><td class="c">$130</td></tr>
+    <tr><td class="en">Zinfandel</td><td class="c dots">●●●●●</td><td class="c dots">●●●<i>●●</i></td><td class="c dots">●●<i>●●●</i></td><td class="c dots">●●●●●</td><td class="c">$250</td></tr>
+  </table>
+  <div class="nota"><b>Para el instructor:</b> la escala es aproximada, según el estilo típico de cada uva, y sirve para practicar. Cada botella puede variar un poco.</div>
+  <span class="num">4</span>
+</section>
+
+<!-- 5 -->
+<section class="slide" id="copiar-5">
+  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-5">Copiar</a>
+  <p class="kicker">Rule 1 · Regla 1</p>
+  <div class="rule"><b>1 syllable → + er</b><span>Adjetivos de una sílaba: se agrega <b>-er</b> y después <b>than</b>.</span></div>
+  <div class="grid g2">
+    <div>
+      <table>
+        <tr><th>Adjective</th><th>Comparative</th><th>Español</th></tr>
+        <tr><td>light</td><td class="en">lighter</td><td class="es">más ligero</td></tr>
+        <tr><td>soft</td><td class="en">softer</td><td class="es">más suave</td></tr>
+        <tr><td>rich</td><td class="en">richer</td><td class="es">más intenso</td></tr>
+        <tr><td>fresh</td><td class="en">fresher</td><td class="es">más fresco</td></tr>
+        <tr><td>dark</td><td class="en">darker</td><td class="es">más oscuro</td></tr>
+        <tr><td>cheap</td><td class="en">cheaper</td><td class="es">más barato</td></tr>
+        <tr><td>ripe → <b>+r</b></td><td class="en">riper</td><td class="es">más maduro</td></tr>
+        <tr><td>big → <b>gg</b></td><td class="en">bigger</td><td class="es">más grande, con más cuerpo</td></tr>
+      </table>
+    </div>
+    <div>
+      <p class="ex">The Pinot Noir is <mark>lighter than</mark> the Malbec.<span class="es">El Pinot Noir es más ligero que el Malbec.</span></p>
+      <p class="ex">The Merlot is <mark>softer than</mark> the Barolo.<span class="es">El Merlot tiene taninos más suaves que el Barolo.</span></p>
+      <p class="ex">The Zinfandel is <mark>riper than</mark> the Barolo.<span class="es">El Zinfandel tiene fruta más madura que el Barolo.</span></p>
+      <p class="ex">The Zinfandel is a <mark>bigger</mark> wine <mark>than</mark> the Pinot Noir.<span class="es">El Zinfandel es un vino con más cuerpo.</span></p>
+    </div>
+  </div>
+  <div class="nota"><b>Ojo:</b> si termina en <b>-e</b>, solo se agrega <b>-r</b> (ripe → riper). Si termina en consonante + vocal + consonante, se dobla la última letra (big → bigger).</div>
+  <span class="num">5</span>
+</section>
+
+<!-- 6 -->
+<section class="slide" id="copiar-6">
+  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-6">Copiar</a>
+  <p class="kicker">Rule 2 · Regla 2</p>
+  <div class="rule"><b>2 syllables, ending in -y → -ier</b><span>Se quita la <b>y</b> y se agrega <b>-ier</b>.</span></div>
+  <div class="grid g2">
+    <div>
+      <table>
+        <tr><th>Adjective</th><th>Comparative</th><th>Español</th></tr>
+        <tr><td>spi·cy</td><td class="en">spicier</td><td class="es">más especiado</td></tr>
+        <tr><td>fruit·y</td><td class="en">fruitier</td><td class="es">más afrutado</td></tr>
+        <tr><td>earth·y</td><td class="en">earthier</td><td class="es">más terroso</td></tr>
+        <tr><td>silk·y</td><td class="en">silkier</td><td class="es">más sedoso</td></tr>
+        <tr><td>heav·y</td><td class="en">heavier</td><td class="es">más pesado</td></tr>
+        <tr><td>pric·ey</td><td class="en">pricier</td><td class="es">más caro (informal)</td></tr>
+      </table>
+    </div>
+    <div>
+      <p class="ex">The Zinfandel is <mark>spicier than</mark> the Merlot.<span class="es">El Zinfandel es más especiado que el Merlot.</span></p>
+      <p class="ex">The Malbec is <mark>fruitier than</mark> the Barolo.<span class="es">El Malbec es más afrutado que el Barolo.</span></p>
+      <p class="ex">The Zinfandel is <mark>heavier than</mark> the Pinot Noir.<span class="es">El Zinfandel es más pesado que el Pinot Noir.</span></p>
+    </div>
+  </div>
+  <div class="nota"><b>Ojo:</b> <span class="bad">spicyer</span> → <span class="good">spicier</span>. Para contar sílabas, se cuentan los sonidos al decir la palabra: spi-cy = 2.</div>
+  <span class="num">6</span>
+</section>
+
+<!-- 7 -->
+<section class="slide" id="copiar-7">
+  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-7">Copiar</a>
+  <p class="kicker">Rule 3 · Regla 3</p>
+  <div class="rule"><b>2+ syllables → more / less</b><span>La mayoría de los adjetivos de dos sílabas o más usan <b>more</b> (más) o <b>less</b> (menos).</span></div>
+  <div class="grid g2">
+    <div>
+      <table>
+        <tr><th>Adjective</th><th>Comparative</th><th>Español</th></tr>
+        <tr><td>el·e·gant</td><td class="en">more elegant</td><td class="es">más elegante</td></tr>
+        <tr><td>in·tense</td><td class="en">more intense</td><td class="es">más intenso</td></tr>
+        <tr><td>tan·nic</td><td class="en">more tannic</td><td class="es">más tánico</td></tr>
+        <tr><td>com·plex</td><td class="en">more complex</td><td class="es">más complejo</td></tr>
+        <tr><td>ex·pen·sive</td><td class="en">more expensive</td><td class="es">más caro</td></tr>
+        <tr><td>af·ford·a·ble</td><td class="en">more affordable</td><td class="es">más accesible</td></tr>
+      </table>
+    </div>
+    <div>
+      <p class="ex">The Pinot Noir is <mark>more elegant than</mark> the Zinfandel.<span class="es">El Pinot Noir es más elegante que el Zinfandel.</span></p>
+      <p class="ex">The Barolo is <mark>more tannic than</mark> the Merlot.<span class="es">El Barolo es más tánico que el Merlot.</span></p>
+      <p class="ex">The Pesquera is <mark>more expensive than</mark> the Kaiken Malbec.<span class="es">El Pesquera ($130) es más caro que el Kaiken ($90).</span></p>
+      <p class="ex">The Merlot is <mark>less tannic than</mark> the Barolo.<span class="es">El Merlot es menos tánico que el Barolo.</span></p>
+    </div>
+  </div>
+  <div class="nota"><b>Con el huésped:</b> en lugar de <i>cheaper</i>, suena más elegante decir <b>more affordable</b>: "The Merlot is more affordable than the Pinot Noir."</div>
+  <span class="num">7</span>
+</section>
+
+<!-- 8 -->
+<section class="slide" id="copiar-8">
+  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-8">Copiar</a>
+  <p class="kicker">Irregular · Irregulares</p>
+  <h2>Good → better · Bad → worse</h2>
+  <p class="lead">No siguen ninguna regla: hay que memorizarlos.</p>
+  <table style="margin-bottom:16px">
+    <tr><th>Adjective</th><th>Comparative</th><th>Español</th><th></th></tr>
+    <tr><td>good</td><td class="en">better</td><td class="es">mejor</td><td class="bad">more good · gooder</td></tr>
+    <tr><td>bad</td><td class="en">worse</td><td class="es">peor</td><td class="bad">more bad · badder</td></tr>
+    <tr><td>far</td><td class="en">farther / further</td><td class="es">más lejos</td><td></td></tr>
+  </table>
+  <p class="ex">For salmon, the Pinot Noir is a <mark>better</mark> choice <mark>than</mark> the Zinfandel.<span class="es">Para el salmón, el Pinot Noir es mejor opción que el Zinfandel.</span></p>
+  <p class="ex">With grilled steak, the Malbec is <mark>better than</mark> the Pinot Noir.<span class="es">Con un corte a la parrilla, el Malbec es mejor que el Pinot Noir.</span></p>
+  <p class="ex">A very tannic wine like the Barolo is a <mark>worse</mark> match for salmon.<span class="es">Un vino muy tánico como el Barolo combina peor con el salmón.</span></p>
+  <span class="num">8</span>
+</section>
+
+<!-- 9 -->
+<section class="slide" id="copiar-9">
+  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-9">Copiar</a>
+  <p class="kicker">More ways to compare · Más estructuras</p>
+  <h2>Much, a little, as… as</h2>
+  <div class="formula">much / a little + comparative <small>· mucho / un poco más</small></div>
+  <p class="ex">The Zinfandel is <mark>much more expensive than</mark> the Merlot. <span class="es">$250 vs $50: mucho más caro.</span></p>
+  <p class="ex">The Barolo is <mark>a little cheaper than</mark> the Pesquera. <span class="es">$120 vs $130: un poco más barato.</span></p>
+  <div class="formula">as + adjective + as <small>· igual de…</small> &nbsp; / &nbsp; not as + adjective + as <small>· no tan… como</small></div>
+  <p class="ex">The Barolo is <mark>almost as expensive as</mark> the Pesquera. <span class="es">Casi igual de caro.</span></p>
+  <p class="ex">The Merlot is <mark>not as tannic as</mark> the Barolo. <span class="es">El Merlot no es tan tánico como el Barolo.</span></p>
+  <div class="nota"><b>Ojo:</b> con <b>as… as</b> el adjetivo no cambia: <span class="bad">as lighter as</span> → <span class="good">as light as</span>.</div>
+  <span class="num">9</span>
+</section>
+
+<!-- 10 -->
+<section class="slide" id="copiar-10">
+  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-10">Copiar</a>
+  <p class="kicker">Old and young · Añadas</p>
+  <h2>Older or younger?</h2>
+  <p class="lead">Dos Nebbiolo mexicanos de nuestra carta, de distinto año de cosecha.</p>
+  <div class="grid g2" style="margin-bottom:18px">
+    <div class="card"><span class="price">$170</span><h3>Las Nubes Gran Reserva Nebbiolo (2018)</h3><div class="meta">Mexico · Valle de Guadalupe</div></div>
+    <div class="card"><span class="price">$180</span><h3>Rolu Nebbiolo (2022)</h3><div class="meta">Mexico · Nebbiolo</div></div>
+  </div>
+  <p class="ex">The Las Nubes is <mark>older than</mark> the Rolu. <span class="es">2018 es una añada más vieja que 2022.</span></p>
+  <p class="ex">The Rolu is <mark>younger than</mark> the Las Nubes. <span class="es">El Rolu es más joven.</span></p>
+  <p class="ex">The Rolu is <mark>a little more expensive than</mark> the Las Nubes. <span class="es">$180 vs $170.</span></p>
+  <div class="nota"><b>Ojo:</b> <i>old</i> y <i>young</i> tienen una sílaba: <b>older, younger</b>. Nunca <span class="bad">more old</span>.</div>
+  <span class="num">10</span>
+</section>
+
+<!-- 11 -->
+<section class="slide" id="copiar-11">
+  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-11">Copiar</a>
+  <p class="kicker">At the table · En la mesa</p>
+  <h2>Model dialogues</h2>
+  <div class="grid g2">
+    <div class="card chat">
+      <h3 style="margin-bottom:10px">1. The guest wants a light wine</h3>
+      <p class="q">Which one is lighter, the Malbec or the Pinot Noir?</p>
+      <p class="a">The Pinot Noir is lighter. It's more elegant and fresher, with red fruit.</p>
+      <p class="q">Is it good with salmon?</p>
+      <p class="a">Yes, it's a better choice for salmon than the Malbec.</p>
+    </div>
+    <div class="card chat">
+      <h3 style="margin-bottom:10px">2. The guest ordered a steak</h3>
+      <p class="q">I'd like a red for my steak. Something not too expensive.</p>
+      <p class="a">I recommend the Kaiken Ultra Malbec. It's more affordable than the Pesquera, and it's richer and fruitier than the Merlot.</p>
+      <p class="q">Perfect, I'll take it.</p>
+    </div>
+  </div>
+  <div class="nota"><b>Para practicar en parejas:</b> uno es el huésped y el otro el mesero. Después cambian de papel y de vinos.</div>
+  <span class="num">11</span>
+</section>
+
+<!-- 12 -->
+<section class="slide" id="copiar-12">
+  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-12">Copiar</a>
+  <p class="kicker">Common mistakes · Errores comunes</p>
+  <h2>Don't say… Say…</h2>
+  <table>
+    <tr><th>Don't say</th><th>Say</th><th>¿Por qué?</th></tr>
+    <tr><td class="bad">This wine is more cheaper.</td><td class="good">This wine is cheaper.</td><td class="es">-er y more nunca van juntos.</td></tr>
+    <tr><td class="bad">The Malbec is more good with steak.</td><td class="good">The Malbec is better with steak.</td><td class="es">good es irregular.</td></tr>
+    <tr><td class="bad">The Zinfandel is spicyer.</td><td class="good">The Zinfandel is spicier.</td><td class="es">-y cambia a -ier.</td></tr>
+    <tr><td class="bad">The Barolo is tannicer.</td><td class="good">The Barolo is more tannic.</td><td class="es">tan·nic tiene dos sílabas y no termina en -y.</td></tr>
+    <tr><td class="bad">It's lighter that the Malbec.</td><td class="good">It's lighter than the Malbec.</td><td class="es">Para comparar se usa than, no that.</td></tr>
+    <tr><td class="bad">The Zinfandel is biger.</td><td class="good">The Zinfandel is bigger.</td><td class="es">Se dobla la consonante final.</td></tr>
+  </table>
+  <div class="nota"><b>Pronunciación:</b> <i>than</i> suena casi como "dan", con la lengua entre los dientes: /ðən/.</div>
+  <span class="num">12</span>
+</section>
+
+<!-- 13 -->
+<section class="slide" id="copiar-13">
+  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-13">Copiar</a>
+  <p class="kicker">Practice 1 · Práctica 1</p>
+  <h2>Complete the sentences</h2>
+  <p class="lead">Escribe la forma comparativa. Usa la tabla de la página 4.</p>
+  <ol class="practica">
+    <li>The Pinot Noir is <span class="blank"></span> (light) than the Malbec.</li>
+    <li>The Zinfandel is <span class="blank"></span> (spicy) than the Merlot.</li>
+    <li>The Barolo is <span class="blank"></span> (tannic) than the Merlot.</li>
+    <li>The Merlot is <span class="blank"></span> (cheap) than the Pinot Noir.</li>
+    <li>The Pesquera is <span class="blank"></span> (expensive) than the Kaiken Malbec.</li>
+    <li>For salmon, the Pinot Noir is <span class="blank"></span> (good) than the Zinfandel.</li>
+    <li>The Zinfandel is a <span class="blank"></span> (big) wine than the Pinot Noir.</li>
+    <li>The Las Nubes 2018 is <span class="blank"></span> (old) than the Rolu 2022.</li>
+    <li>The Merlot is <span class="blank"></span> (smooth) than the Barolo.</li>
+    <li>The Pinot Noir is <span class="blank"></span> (elegant) than the Zinfandel.</li>
+    <li>The Zinfandel is <span class="blank"></span> (ripe) than the Barolo.</li>
+    <li>The Merlot is not <span class="blank"></span> tannic <span class="blank" style="min-width:60px"></span> the Barolo.</li>
+  </ol>
+  <span class="num">13</span>
+</section>
+
+<!-- 14 -->
+<section class="slide" id="copiar-14">
+  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-14">Copiar</a>
+  <p class="kicker">Practice 2 · Práctica 2</p>
+  <h2>Role-play: help the guest choose</h2>
+  <p class="lead">En parejas. El huésped lee su tarjeta; el mesero compara dos vinos y recomienda uno.</p>
+  <div class="grid g3">
+    <div class="card"><h3>Card A</h3><p>"I'm having the salmon. Pinot Noir or Zinfandel?"</p><p class="es" style="margin-top:6px">Usa: lighter, fresher, better</p></div>
+    <div class="card"><h3>Card B</h3><p>"I don't like strong tannins. Barolo or Merlot?"</p><p class="es" style="margin-top:6px">Usa: softer, smoother, less tannic</p></div>
+    <div class="card"><h3>Card C</h3><p>"Something special for our anniversary."</p><p class="es" style="margin-top:6px">Usa: more expensive, richer, much more…</p></div>
+    <div class="card"><h3>Card D</h3><p>"A red for my steak, not too expensive."</p><p class="es" style="margin-top:6px">Usa: more affordable, fruitier, better</p></div>
+    <div class="card"><h3>Card E</h3><p>"Which Nebbiolo is older?"</p><p class="es" style="margin-top:6px">Usa: older, younger, a little more expensive</p></div>
+    <div class="card"><h3>Card F</h3><p>"I like spicy, full wines."</p><p class="es" style="margin-top:6px">Usa: spicier, bigger, heavier</p></div>
+  </div>
+  <span class="num">14</span>
+</section>
+
+<!-- 15 -->
+<section class="slide" id="copiar-15">
+  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-15">Copiar</a>
+  <p class="kicker">Answer key · Respuestas</p>
+  <h2>Practice 1 answers</h2>
+  <ol class="practica">
+    <li class="en">lighter</li>
+    <li class="en">spicier</li>
+    <li class="en">more tannic</li>
+    <li class="en">cheaper <span class="es">(o more affordable)</span></li>
+    <li class="en">more expensive</li>
+    <li class="en">better</li>
+    <li class="en">bigger</li>
+    <li class="en">older</li>
+    <li class="en">smoother</li>
+    <li class="en">more elegant</li>
+    <li class="en">riper</li>
+    <li class="en">as … as</li>
+  </ol>
+  <div class="nota"><b>Cierre de la clase:</b> cada mesero dice una comparación de dos vinos de la carta usando una regla distinta: -er, -ier, more/less y better/worse.</div>
+  <span class="num">15</span>
+</section>
+
+<script>
+// Copia el texto de una diapositiva para pegarlo en Canva. Las diapositivas copiadas quedan marcadas en este navegador.
+const CLAVE = "copiados-comparativos-vinos-tintos";
+const slides = [...document.querySelectorAll(".slide")];
+const leer = () => { try { return new Set(JSON.parse(localStorage.getItem(CLAVE) || "[]")); } catch (e) { return new Set(); } };
+function pintar() {
+  const h = leer();
+  slides.forEach((s) => { const si = h.has(s.id); s.classList.toggle("hecho", si); const b = s.querySelector("button.copiar"); b.textContent = si ? "✓ Copiado" : "Copiar"; b.classList.toggle("ok", si); });
+  document.getElementById("avance").textContent = h.size + " de " + slides.length + " diapositivas copiadas";
+}
+function marcar(s) { const h = leer(); h.add(s.id); try { localStorage.setItem(CLAVE, JSON.stringify([...h])); } catch (e) {} pintar(); }
+function texto(s) {
+  s.classList.add("leyendo");
+  const t = s.innerText.replace(/\n{3,}/g, "\n\n").trim();
+  s.classList.remove("leyendo");
+  return t;
+}
+async function copiar(t) {
+  try { await navigator.clipboard.writeText(t); }
+  catch (e) { const a = document.createElement("textarea"); a.value = t; document.body.appendChild(a); a.select(); const ok = document.execCommand("copy"); a.remove(); if (!ok) throw e; }
+}
+function avisar(m) { let v = document.querySelector(".aviso"); if (!v) { v = document.createElement("div"); v.className = "aviso"; document.body.appendChild(v); } v.textContent = m; clearTimeout(avisar.t); avisar.t = setTimeout(() => v.remove(), 4000); }
+document.addEventListener("click", async (e) => {
+  const b = e.target.closest("button.copiar");
+  if (b) {
+    const s = b.closest(".slide");
+    try { await copiar(texto(s)); marcar(s); avisar("✓ Copiada la diapositiva " + s.id.split("-")[1] + ". Pégala en Canva con Cmd+V."); }
+    catch (err) { avisar("No se pudo copiar. Selecciona el texto y usa Cmd+C."); }
+  }
+  if (e.target.id === "reiniciar" && confirm("¿Quitar todas las marcas?")) { try { localStorage.removeItem(CLAVE); } catch (err) {} pintar(); }
+});
+// Al llegar desde el enlace "Copiar" del PDF: copia esa diapositiva; si el navegador no lo permite, pide un toque.
+window.addEventListener("load", async () => {
+  pintar();
+  const s = location.hash && document.querySelector(location.hash);
+  if (!s) return;
+  s.scrollIntoView();
+  try { await navigator.clipboard.writeText(texto(s)); marcar(s); avisar("✓ Copiada la diapositiva " + s.id.split("-")[1] + ". Pégala en Canva con Cmd+V."); }
+  catch (e) { s.querySelector("button.copiar").textContent = "Toca para copiar"; avisar("Toca el botón verde para copiar la diapositiva " + s.id.split("-")[1] + "."); }
+});
+</script>
+</body>
+</html>
