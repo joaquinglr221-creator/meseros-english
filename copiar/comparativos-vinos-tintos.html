@@ -57,27 +57,34 @@
   .portada p { font-size: 24px; margin: 6px 0; opacity: .92; }
   .portada .copas { font-size: 70px; margin-bottom: 10px; }
   .sil { display: inline-block; background: #fff; color: var(--vino); border-radius: 99px; padding: 1px 10px; font-weight: 800; font-size: 14px; margin-left: 6px; vertical-align: 3px; }
-  /* Copiar: en pantalla un botón; en el PDF un enlace a la página publicada, que copia la diapositiva al abrirse */
-  .copiar { position: absolute; top: .3in; right: .45in; z-index: 3; font: 700 15px -apple-system, Arial, sans-serif; color: #fff; background: var(--verde);
-    border: 0; border-radius: 99px; padding: 7px 16px; cursor: pointer; text-decoration: none; }
-  .copiar.ok { background: #2f8a4c; }
-  a.copiar { display: none; }
-  .portada .copiar { background: #fff; color: var(--vino); }
-  .slide.hecho::after { content: "✓ copiada"; position: absolute; top: .36in; right: 1.75in; font: 700 13px -apple-system, Arial, sans-serif; color: #2f8a4c; }
-  .slide:target { outline: 6px solid #ffd76a; outline-offset: -6px; }
-  .leyendo .copiar, .leyendo .num { display: none !important; }
+  /* Copiar por concepto: en pantalla un botón; en el PDF un enlace a la página publicada, que copia ese concepto al abrirse */
+  .concepto { position: relative; }
+  .cp { position: absolute; top: 4px; right: 4px; z-index: 3; font: 700 11px/1 -apple-system, Arial, sans-serif; color: #fff; background: var(--verde);
+    border: 0; border-radius: 99px; padding: 5px 9px; cursor: pointer; text-decoration: none; opacity: .9; }
+  li.concepto, p.ex.concepto { padding-right: 62px; }
+  .rule.concepto, .formula.concepto, .nota.concepto { padding-right: 70px; }
+  .rule .cp, .portada .cp { background: #fff; color: var(--vino); }
+  .tabla-cp { position: relative; height: 0; }
+  .tabla-cp .cp { top: -26px; right: 0; }
+  .card.concepto { padding-bottom: 30px; }
+  .card > .cp { top: auto; bottom: 7px; }
+  a.cp { display: none; }
+  .concepto.hecho { box-shadow: inset 0 0 0 2px #2f8a4c; border-radius: 8px; }
+  .cp.ok { background: #2f8a4c; color: #fff; }
+  .concepto:target { background-color: #fff4c2; }
+  .leyendo .cp { display: none !important; }
+  .leyendo .dots i { display: none; }
   .aviso { position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 9; background: var(--verde); color: #fff; font-weight: 700; padding: 12px 20px; border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,.25); max-width: 90vw; }
   .barra { max-width: 11in; margin: 0 auto 12px; padding: 14px 4px 0; font: 15px -apple-system, Arial, sans-serif; color: #333; }
   .barra button { font: inherit; background: none; border: 1px solid #aaa; border-radius: 99px; padding: 3px 12px; margin-left: 8px; cursor: pointer; }
-  @media print { button.copiar, .barra, .aviso { display: none !important; } a.copiar { display: inline-block; } .slide.hecho::after { display: none; } }
+  @media print { button.cp, .barra, .aviso { display: none !important; } a.cp { display: inline-block; } .concepto.hecho { box-shadow: none; } }
 </style>
 </head>
 <body>
-<div class="barra"><b id="avance"></b> · Cada diapositiva tiene su botón Copiar: pega el texto en Canva con Cmd+V. <button id="reiniciar" type="button">Quitar marcas</button></div>
+<div class="barra"><b id="avance"></b> · Cada concepto tiene su botón Copiar: pégalo en Canva con Cmd+V. <button id="reiniciar" type="button">Quitar marcas</button></div>
 
 <!-- 1 -->
-<section class="slide portada" id="copiar-1">
-  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-1">Copiar</a>
+<section class="slide portada">
   <div class="copas">🍷🍷</div>
   <p class="kicker">English for Waiters · Wine Service</p>
   <h1>Comparing Red Wines</h1>
@@ -86,8 +93,7 @@
 </section>
 
 <!-- 2 -->
-<section class="slide" id="copiar-2">
-  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-2">Copiar</a>
+<section class="slide">
   <p class="kicker">Today's goal · Objetivo</p>
   <h2>By the end of the class you can…</h2>
   <p class="lead">Al terminar la clase, el mesero podrá:</p>
@@ -102,8 +108,7 @@
 </section>
 
 <!-- 3 -->
-<section class="slide" id="copiar-3">
-  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-3">Copiar</a>
+<section class="slide">
   <p class="kicker">Our red wines · Nuestros tintos</p>
   <h2>Six wines from our wine list</h2>
   <p class="lead">Seis tintos de la carta con estilos muy distintos.</p>
@@ -120,8 +125,7 @@
 </section>
 
 <!-- 4 -->
-<section class="slide" id="copiar-4">
-  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-4">Copiar</a>
+<section class="slide">
   <p class="kicker">Side by side · Lado a lado</p>
   <h2>How are they different?</h2>
   <p class="lead">Más puntos = más de esa característica.</p>
@@ -139,8 +143,7 @@
 </section>
 
 <!-- 5 -->
-<section class="slide" id="copiar-5">
-  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-5">Copiar</a>
+<section class="slide">
   <p class="kicker">Rule 1 · Regla 1</p>
   <div class="rule"><b>1 syllable → + er</b><span>Adjetivos de una sílaba: se agrega <b>-er</b> y después <b>than</b>.</span></div>
   <div class="grid g2">
@@ -169,8 +172,7 @@
 </section>
 
 <!-- 6 -->
-<section class="slide" id="copiar-6">
-  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-6">Copiar</a>
+<section class="slide">
   <p class="kicker">Rule 2 · Regla 2</p>
   <div class="rule"><b>2 syllables, ending in -y → -ier</b><span>Se quita la <b>y</b> y se agrega <b>-ier</b>.</span></div>
   <div class="grid g2">
@@ -196,8 +198,7 @@
 </section>
 
 <!-- 7 -->
-<section class="slide" id="copiar-7">
-  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-7">Copiar</a>
+<section class="slide">
   <p class="kicker">Rule 3 · Regla 3</p>
   <div class="rule"><b>2+ syllables → more / less</b><span>La mayoría de los adjetivos de dos sílabas o más usan <b>more</b> (más) o <b>less</b> (menos).</span></div>
   <div class="grid g2">
@@ -224,8 +225,7 @@
 </section>
 
 <!-- 8 -->
-<section class="slide" id="copiar-8">
-  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-8">Copiar</a>
+<section class="slide">
   <p class="kicker">Irregular · Irregulares</p>
   <h2>Good → better · Bad → worse</h2>
   <p class="lead">No siguen ninguna regla: hay que memorizarlos.</p>
@@ -242,8 +242,7 @@
 </section>
 
 <!-- 9 -->
-<section class="slide" id="copiar-9">
-  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-9">Copiar</a>
+<section class="slide">
   <p class="kicker">More ways to compare · Más estructuras</p>
   <h2>Much, a little, as… as</h2>
   <div class="formula">much / a little + comparative <small>· mucho / un poco más</small></div>
@@ -257,8 +256,7 @@
 </section>
 
 <!-- 10 -->
-<section class="slide" id="copiar-10">
-  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-10">Copiar</a>
+<section class="slide">
   <p class="kicker">Old and young · Añadas</p>
   <h2>Older or younger?</h2>
   <p class="lead">Dos Nebbiolo mexicanos de nuestra carta, de distinto año de cosecha.</p>
@@ -274,8 +272,7 @@
 </section>
 
 <!-- 11 -->
-<section class="slide" id="copiar-11">
-  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-11">Copiar</a>
+<section class="slide">
   <p class="kicker">At the table · En la mesa</p>
   <h2>Model dialogues</h2>
   <div class="grid g2">
@@ -298,8 +295,7 @@
 </section>
 
 <!-- 12 -->
-<section class="slide" id="copiar-12">
-  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-12">Copiar</a>
+<section class="slide">
   <p class="kicker">Common mistakes · Errores comunes</p>
   <h2>Don't say… Say…</h2>
   <table>
@@ -316,8 +312,7 @@
 </section>
 
 <!-- 13 -->
-<section class="slide" id="copiar-13">
-  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-13">Copiar</a>
+<section class="slide">
   <p class="kicker">Practice 1 · Práctica 1</p>
   <h2>Complete the sentences</h2>
   <p class="lead">Escribe la forma comparativa. Usa la tabla de la página 4.</p>
@@ -339,8 +334,7 @@
 </section>
 
 <!-- 14 -->
-<section class="slide" id="copiar-14">
-  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-14">Copiar</a>
+<section class="slide">
   <p class="kicker">Practice 2 · Práctica 2</p>
   <h2>Role-play: help the guest choose</h2>
   <p class="lead">En parejas. El huésped lee su tarjeta; el mesero compara dos vinos y recomienda uno.</p>
@@ -356,8 +350,7 @@
 </section>
 
 <!-- 15 -->
-<section class="slide" id="copiar-15">
-  <button class="copiar" type="button">Copiar</button><a class="copiar" href="https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=1#copiar-15">Copiar</a>
+<section class="slide">
   <p class="kicker">Answer key · Respuestas</p>
   <h2>Practice 1 answers</h2>
   <ol class="practica">
@@ -379,44 +372,72 @@
 </section>
 
 <script>
-// Copia el texto de una diapositiva para pegarlo en Canva. Las diapositivas copiadas quedan marcadas en este navegador.
-const CLAVE = "copiados-comparativos-vinos-tintos";
-const slides = [...document.querySelectorAll(".slide")];
+// Botón Copiar en cada concepto (título, regla, tarjeta, tabla, ejemplo, nota, ejercicio), para pegarlo por partes en Canva.
+// Los ids salen del orden de la página, así que el enlace del PDF y la página publicada apuntan al mismo concepto.
+const WEB = "https://joaquinglr221-creator.github.io/meseros-english/copiar/comparativos-vinos-tintos.html?v=2";
+const CLAVE = "copiados-comparativos-conceptos";
+const SELECTOR = "h1, h2, .rule, .card, table, .ex, .formula, .nota, ol.practica li";
+const conceptos = [];
+document.querySelectorAll(".slide").forEach((slide, si) => {
+  let k = 0;
+  slide.querySelectorAll(SELECTOR).forEach((el) => {
+    if (el.parentElement.closest(".card, .nota, .rule")) return; // ya va dentro de otro concepto
+    const id = `c${si + 1}-${++k}`;
+    const boton = `<button class="cp" type="button">Copiar</button><a class="cp" href="${WEB}#${id}">Copiar</a>`;
+    let marca = el;
+    if (el.tagName === "TABLE") {
+      marca = document.createElement("div");
+      marca.className = "tabla-cp";
+      el.before(marca);
+      marca.tabla = el;
+    }
+    marca.id = id;
+    marca.classList.add("concepto");
+    marca.insertAdjacentHTML("beforeend", boton);
+    conceptos.push(marca);
+  });
+});
+function texto(c) {
+  const partes = [c.tabla || c];
+  const lead = c.tagName === "H2" && c.nextElementSibling && c.nextElementSibling.classList.contains("lead") ? c.nextElementSibling : null;
+  if (lead) partes.push(lead);
+  document.body.classList.add("leyendo");
+  const t = partes.map((p) => p.innerText.trim()).join("\n").replace(/\n{3,}/g, "\n\n");
+  document.body.classList.remove("leyendo");
+  return t;
+}
 const leer = () => { try { return new Set(JSON.parse(localStorage.getItem(CLAVE) || "[]")); } catch (e) { return new Set(); } };
 function pintar() {
   const h = leer();
-  slides.forEach((s) => { const si = h.has(s.id); s.classList.toggle("hecho", si); const b = s.querySelector("button.copiar"); b.textContent = si ? "✓ Copiado" : "Copiar"; b.classList.toggle("ok", si); });
-  document.getElementById("avance").textContent = h.size + " de " + slides.length + " diapositivas copiadas";
+  conceptos.forEach((c) => { const si = h.has(c.id); c.classList.toggle("hecho", si); const b = c.querySelector("button.cp"); b.textContent = si ? "✓" : "Copiar"; b.classList.toggle("ok", si); });
+  const barra = document.getElementById("avance");
+  if (barra) barra.textContent = conceptos.filter((c) => h.has(c.id)).length + " de " + conceptos.length + " conceptos copiados";
 }
-function marcar(s) { const h = leer(); h.add(s.id); try { localStorage.setItem(CLAVE, JSON.stringify([...h])); } catch (e) {} pintar(); }
-function texto(s) {
-  s.classList.add("leyendo");
-  const t = s.innerText.replace(/\n{3,}/g, "\n\n").trim();
-  s.classList.remove("leyendo");
-  return t;
-}
+function marcar(c) { const h = leer(); h.add(c.id); try { localStorage.setItem(CLAVE, JSON.stringify([...h])); } catch (e) {} pintar(); }
 async function copiar(t) {
   try { await navigator.clipboard.writeText(t); }
   catch (e) { const a = document.createElement("textarea"); a.value = t; document.body.appendChild(a); a.select(); const ok = document.execCommand("copy"); a.remove(); if (!ok) throw e; }
 }
 function avisar(m) { let v = document.querySelector(".aviso"); if (!v) { v = document.createElement("div"); v.className = "aviso"; document.body.appendChild(v); } v.textContent = m; clearTimeout(avisar.t); avisar.t = setTimeout(() => v.remove(), 4000); }
+const resumen = (t) => (t.length > 60 ? t.slice(0, 60) + "…" : t).replace(/\s+/g, " ");
 document.addEventListener("click", async (e) => {
-  const b = e.target.closest("button.copiar");
+  const b = e.target.closest("button.cp");
   if (b) {
-    const s = b.closest(".slide");
-    try { await copiar(texto(s)); marcar(s); avisar("✓ Copiada la diapositiva " + s.id.split("-")[1] + ". Pégala en Canva con Cmd+V."); }
+    const c = b.closest(".concepto"), t = texto(c);
+    try { await copiar(t); marcar(c); avisar("✓ Copiado: " + resumen(t) + " Pégalo en Canva con Cmd+V."); }
     catch (err) { avisar("No se pudo copiar. Selecciona el texto y usa Cmd+C."); }
   }
   if (e.target.id === "reiniciar" && confirm("¿Quitar todas las marcas?")) { try { localStorage.removeItem(CLAVE); } catch (err) {} pintar(); }
 });
-// Al llegar desde el enlace "Copiar" del PDF: copia esa diapositiva; si el navegador no lo permite, pide un toque.
+pintar();
+// Al llegar desde el enlace "Copiar" del PDF: copia ese concepto; si el navegador no lo permite, pide un toque.
 window.addEventListener("load", async () => {
-  pintar();
-  const s = location.hash && document.querySelector(location.hash);
-  if (!s) return;
-  s.scrollIntoView();
-  try { await navigator.clipboard.writeText(texto(s)); marcar(s); avisar("✓ Copiada la diapositiva " + s.id.split("-")[1] + ". Pégala en Canva con Cmd+V."); }
-  catch (e) { s.querySelector("button.copiar").textContent = "Toca para copiar"; avisar("Toca el botón verde para copiar la diapositiva " + s.id.split("-")[1] + "."); }
+  const c = location.hash && document.getElementById(location.hash.slice(1));
+  if (!c) return;
+  c.scrollIntoView({ block: "center" });
+  const t = texto(c);
+  try { await navigator.clipboard.writeText(t); marcar(c); avisar("✓ Copiado: " + resumen(t) + " Pégalo en Canva con Cmd+V."); }
+  catch (e) { c.querySelector("button.cp").textContent = "Toca para copiar"; avisar("Toca el botón verde para copiar: " + resumen(t)); }
 });
 </script>
 </body>
