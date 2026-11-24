@@ -71,6 +71,8 @@
   .card > .cp { top: auto; bottom: 7px; }
   a.cp { display: none; }
   .concepto.hecho { box-shadow: inset 0 0 0 2px #2f8a4c; border-radius: 8px; }
+  .sw.hecho { box-shadow: inset 0 0 0 2px #2f8a4c; }
+  @media print { .sw.hecho { box-shadow: none; } }
   .cp.ok { background: #2f8a4c; color: #fff; }
   .concepto:target { background-color: #fff4c2; }
   .leyendo .cp { display: none !important; }
@@ -96,7 +98,7 @@
   .fila-et p { margin: 0; font-size: 12.5px; line-height: 1.25; }
   .fila-et .ej { margin-top: 2px !important; font-size: 11.5px !important; }
   .ej { font-weight: 700; color: var(--oro); } .ej::before { content: "Ej.: "; }
-  .sw { display: flex; gap: 8px; align-items: center; padding: 4px 4px 4px 2px; border-radius: 10px; }
+  .sw { display: flex; gap: 8px; align-items: center; padding: 4px 4px 4px 6px; border-radius: 10px; }
   .sw .disco { flex: 0 0 58px; height: 46px; border-radius: 50%; background: radial-gradient(ellipse at 45% 50%, var(--c) 0 55%, color-mix(in srgb, var(--c) 55%, #fff) 100%); box-shadow: inset 0 0 0 1px rgba(0,0,0,.1); }
   .sw b { font-size: 14px; display: block; line-height: 1.15; }
   .sw .es { font-size: 13px; }
@@ -108,7 +110,7 @@
 </style>
 </head>
 <body>
-<div class="barra"><b id="avance"></b> · Cada color tiene su botón Copiar (nombre y código #): pégalo en Canva con Cmd+V. <button id="reiniciar" type="button">Quitar marcas</button></div>
+<div class="barra"><b id="avance"></b> · Cada color tiene su botón Copiar, que copia sus tres tonos (pale, medium y deep) con su código #: pégalo en Canva con Cmd+V. <button id="reiniciar" type="button">Quitar marcas</button></div>
 <section class="slide portada"><div class="copas">🍷🥂</div><p class="kicker">English for Waiters · Wine Service</p><h1>Wine Color Palette</h1>
 <p>Red, white and rosé wines · <b>pale</b>, <b>medium</b> and <b>deep</b></p><p style="font-size:19px;margin-top:22px">Paleta de colores de los vinos tintos, blancos y rosados, con su código para Canva</p>
 <div class="tira-portada"><i style="background:#E6EBA3"></i><i style="background:#EEDE88"></i><i style="background:#E2B955"></i><i style="background:#CC8B33"></i><i style="background:#9E6A35"></i><i style="background:#F2A2B6"></i><i style="background:#F4B09A"></i><i style="background:#EFA878"></i><i style="background:#5E1A4A"></i><i style="background:#9B1B35"></i><i style="background:#82242A"></i><i style="background:#9E5A2E"></i><i style="background:#6B4226"></i></div></section><section class="slide"><p class="kicker">The whole palette · Toda la paleta</p><h2>Wine colors at a glance</h2><p class="lead">Los colores principales de cada tipo de vino, del más joven al más viejo.</p>
@@ -188,9 +190,9 @@
 <script>
 // Botón Copiar en cada concepto (título, regla, tarjeta, tabla, ejemplo, nota, ejercicio), para pegarlo por partes en Canva.
 // Los ids salen del orden de la página, así que el enlace del PDF y la página publicada apuntan al mismo concepto.
-const WEB = "https://joaquinglr221-creator.github.io/meseros-english/copiar/paleta-colores-vinos.html?v=1";
+const WEB = "https://joaquinglr221-creator.github.io/meseros-english/copiar/paleta-colores-vinos.html?v=2";
 const CLAVE = "copiados-paleta-vinos-conceptos";
-const SELECTOR = "h1, h2, .rule, .card, table, .ex, .formula, .nota, ol.practica li, .sw, .fila-et";
+const SELECTOR = "h1, h2, .rule, .card, table, .ex, .formula, .nota, ol.practica li, .fila-et";
 const conceptos = [];
 document.querySelectorAll(".slide").forEach((slide, si) => {
   let k = 0;
@@ -211,19 +213,26 @@ document.querySelectorAll(".slide").forEach((slide, si) => {
     conceptos.push(marca);
   });
 });
+function tonos(c) { const r = []; let s = c.nextElementSibling; while (s && s.classList.contains("sw")) { r.push(s); s = s.nextElementSibling; } return r; }
 function texto(c) {
   const partes = [c.tabla || c];
   const lead = c.tagName === "H2" && c.nextElementSibling && c.nextElementSibling.classList.contains("lead") ? c.nextElementSibling : null;
   if (lead) partes.push(lead);
   document.body.classList.add("leyendo");
-  const t = partes.map((p) => p.innerText.trim()).join("\n").replace(/\n{3,}/g, "\n\n");
+  let t = partes.map((p) => p.innerText.trim()).join("\n").replace(/\n{3,}/g, "\n\n");
+  // Fila de color: copia también sus tres tonos (pale, medium, deep), uno por renglón
+  if (c.classList.contains("fila-et")) {
+    const q = (sel) => c.querySelector(sel).innerText.trim();
+    t = q("h3") + " · " + q(".meta") + "\n" + q("p.en") + " · " + q("p.es") + "\nEj.: " + q(".ej");
+  }
+  if (c.classList.contains("fila-et")) t += "\n\n" + tonos(c).map((s) => s.innerText.trim().split("\n").filter(Boolean).join(" · ")).join("\n");
   document.body.classList.remove("leyendo");
   return t;
 }
 const leer = () => { try { return new Set(JSON.parse(localStorage.getItem(CLAVE) || "[]")); } catch (e) { return new Set(); } };
 function pintar() {
   const h = leer();
-  conceptos.forEach((c) => { const si = h.has(c.id); c.classList.toggle("hecho", si); const b = c.querySelector("button.cp"); b.textContent = si ? "✓" : "Copiar"; b.classList.toggle("ok", si); });
+  conceptos.forEach((c) => { const si = h.has(c.id); c.classList.toggle("hecho", si); if (c.classList.contains("fila-et")) tonos(c).forEach((s) => s.classList.toggle("hecho", si)); const b = c.querySelector("button.cp"); b.textContent = si ? "✓" : "Copiar"; b.classList.toggle("ok", si); });
   const barra = document.getElementById("avance");
   if (barra) barra.textContent = conceptos.filter((c) => h.has(c.id)).length + " de " + conceptos.length + " conceptos copiados";
 }
