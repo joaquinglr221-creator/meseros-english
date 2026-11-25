@@ -372,6 +372,8 @@ function viewPhrases() {
 
 // ---------- Menús ----------
 const HAS_HOTEL_DATA = typeof HOTEL_DATA !== "undefined";
+// Fotos de los platillos por restaurante: { rosewater: { "Greek": "images/hotel/rosewater/greek.jpg" } }
+const DISH_IMAGES = typeof MENU_IMAGES !== "undefined" ? MENU_IMAGES : {};
 const andList = (items) => (items.length > 1 ? `${items.slice(0, -1).join(", ")} and ${items[items.length - 1]}` : items[0] || "");
 
 // Ícono y tipo de cocina de un restaurante, según palabras genéricas de su cocina o nombre.
@@ -461,15 +463,19 @@ function viewMenu(restId, menuIdx) {
         <div class="card list">
           ${sec.items
             .map(
-              (d) => `
-            <div class="phrase">
-              <div>
+              (d) => {
+              const foto = (DISH_IMAGES[rest.id] || {})[d.name];
+              return `
+            <div class="phrase${foto ? " with-photo" : ""}">
+              ${foto ? `<img class="dish-thumb" src="${esc(foto)}" alt="${esc(d.name)}" loading="lazy" data-dish-zoom="${esc(d.name)}" data-dish-es="${esc(d.nameEs || "")}">` : ""}
+              <div class="dish-text">
                 <p class="en">${esc(d.name)}</p>
                 ${d.desc ? `<p class="desc">${esc(d.desc)}</p>` : ""}
                 ${d.nameEs ? `<p class="es">${esc(d.nameEs)}${d.descEs ? `: ${esc(d.descEs)}` : ""}</p>` : ""}
               </div>
               <div class="row">${speakButtons(d.desc ? `${d.name}. ${d.desc}` : d.name)}</div>
-            </div>`
+            </div>`;
+            }
             )
             .join("")}
         </div>`;
@@ -1000,6 +1006,17 @@ document.addEventListener("click", (e) => {
   if (hidden && !e.target.closest("button")) hidden.classList.toggle("revealed");
 
   if (e.target.closest("[data-back-cats]")) return window.scrollTo({ top: 0, behavior: "smooth" });
+
+  const dishZoom = e.target.closest("[data-dish-zoom]");
+  if (dishZoom) {
+    const box = document.createElement("div");
+    box.className = "lightbox";
+    box.innerHTML = `<img src="${esc(dishZoom.getAttribute("src"))}" alt=""><p>🇺🇸 ${esc(dishZoom.dataset.dishZoom)}</p>${dishZoom.dataset.dishEs ? `<p class="es">${esc(dishZoom.dataset.dishEs)}</p>` : ""}`;
+    box.onclick = () => box.remove();
+    document.body.appendChild(box);
+    speak(dishZoom.dataset.dishZoom);
+    return;
+  }
 
   const zoom = e.target.closest("[data-zoom]");
   if (zoom) {
